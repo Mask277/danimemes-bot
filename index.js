@@ -987,8 +987,14 @@
     if (skip) skip.addEventListener('click', close);
 
     // Esc key — same as SKIP; only acts when the screen is actually visible.
+    // Defer to the easter-egg portal: both Escape handlers live on `document`,
+    // so when the Fifth Realm portal is open we must NOT also dismiss the entry
+    // screen underneath it (Escape there should only close the portal).
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !screen.classList.contains('entry-hidden')) close();
+      if (e.key !== 'Escape' || screen.classList.contains('entry-hidden')) return;
+      const portal = document.getElementById('fifthRealmPortal');
+      if (portal && !portal.classList.contains('fifth-realm-hidden')) return;
+      close();
     });
 
     // Footer "↻ CHANGE WORLD" link — re-show the overlay.
@@ -1005,6 +1011,159 @@
   }
 
   // -----------------------------------------------------------------
+  // Easter egg — FIFTH REALM portal
+  //
+  // TRIGGER: 7 rapid clicks on .med-frame (the circular Dan portrait inside
+  //          .entry-medallion). "Rapid" = each click must arrive within 600 ms
+  //          of the previous one; a longer gap resets the counter to 0.
+  //
+  // WHY .med-frame and NOT .entry-medallion:
+  //   .entry-medallion has pointer-events:none so its presence doesn't
+  //   interfere with the card hover / rotation effects driven by
+  //   .entry-grid:has(.e-arr:hover) etc. Only .med-frame gets
+  //   pointer-events:auto + cursor:pointer (set in styles.css), confining
+  //   the clickable area to the small center circle.
+  //
+  // PORTAL: full-screen overlay, z-index 10000 (above entry-screen 9999).
+  //   Colors auto-adapt via var(--bg) / var(--fg) — no per-world rules needed.
+  //
+  // CLOSE: × button, Escape key, or clicking the backdrop.
+  //   Focus is moved to the portal on open and restored on close.
+  // -----------------------------------------------------------------
+  function initEasterEgg() {
+    const portal    = document.getElementById('fifthRealmPortal');
+    const medallion = document.querySelector('#entryScreen .entry-medallion');
+    const medFrame  = document.querySelector('#entryScreen .med-frame');
+    if (!portal || !medallion) return;
+
+    const closeBtn  = portal.querySelector('.frp-close');
+    const backdrop  = portal.querySelector('.frp-backdrop');
+
+    // --- Click-counter state ---
+    const CLICKS_NEEDED  = 7;
+    const RAPID_MS       = 600;   // max gap between successive rapid clicks
+    let   clickCount     = 0;
+    let   lastClickTime  = 0;
+    let   pulseTimer     = null;  // used to remove the pulse class after each click
+
+    // --- Focus restoration ---
+    // Remember which element had focus before the portal opened so we can
+    // return focus cleanly on close.
+    let focusReturnTarget = null;
+
+    // ------------------------------------------------------------------
+    // Open / close
+    // ------------------------------------------------------------------
+    function openPortal() {
+      focusReturnTarget = document.activeElement;
+
+      portal.classList.remove('fifth-realm-hidden');
+
+      // Move focus to the close button so keyboard users can act immediately.
+      // Deferred one frame so the element is fully visible / painted first.
+      requestAnimationFrame(() => {
+        if (closeBtn) closeBtn.focus();
+      });
+    }
+
+    function closePortal() {
+      portal.classList.add('fifth-realm-hidden');
+
+      // Restore focus to wherever it was before the portal opened.
+      if (focusReturnTarget && typeof focusReturnTarget.focus === 'function') {
+        focusReturnTarget.focus({ preventScroll: true });
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Click-pulse feedback on .med-frame
+    // Adds the CSS class that triggers a brief scale-bump animation, then
+    // removes it so the animation can replay on the next click.
+    // ------------------------------------------------------------------
+    function triggerMedPulse() {
+      if (reducedMotion || !medFrame) return; // honour user preference; pulse needs the frame
+      if (pulseTimer !== null) {
+        // Clear any lingering timer so overlapping rapid clicks don't
+        // stack up class-removal callbacks.
+        clearTimeout(pulseTimer);
+        medFrame.classList.remove('med-frame-pulse');
+        // Force a reflow between remove and re-add so the animation restarts
+        // even if a previous animation is still mid-way.
+        void medFrame.offsetWidth;
+      }
+      medFrame.classList.add('med-frame-pulse');
+      pulseTimer = setTimeout(() => {
+        medFrame.classList.remove('med-frame-pulse');
+        pulseTimer = null;
+      }, 250);
+    }
+
+    // ------------------------------------------------------------------
+    // Click handler on the whole medallion (large hit target)
+    // ------------------------------------------------------------------
+    medallion.addEventListener('click', (e) => {
+      // Any click anywhere on the medallion (including its enlarged ::after
+      // pad) counts. We still gate on the entry screen being visible so the
+      // easter egg stays inactive while browsing the main page.
+      const screen = document.getElementById('entryScreen');
+      if (!screen || screen.classList.contains('entry-hidden')) {
+        // Entry screen not showing — easter egg is inactive while browsing
+        // the main page, so reset and bail.
+        clickCount    = 0;
+        lastClickTime = 0;
+        return;
+      }
+
+      const now = Date.now();
+      const gap = now - lastClickTime;
+
+      // Gap check: if more than RAPID_MS elapsed since the last click,
+      // this click starts a fresh sequence.
+      if (lastClickTime === 0 || gap > RAPID_MS) {
+        clickCount = 1;
+      } else {
+        clickCount++;
+      }
+      lastClickTime = now;
+
+      // Pulse feedback from click 2 onward so the user notices something
+      // is building (click 1 is indistinguishable from idle browsing).
+      if (clickCount > 1) {
+        triggerMedPulse();
+      }
+
+      // On the 7th rapid click, open the portal.
+      if (clickCount >= CLICKS_NEEDED) {
+        clickCount    = 0;
+        lastClickTime = 0;
+        openPortal();
+      }
+    });
+
+    // ------------------------------------------------------------------
+    // Close affordances
+    // ------------------------------------------------------------------
+
+    // × button
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closePortal);
+    }
+
+    // Backdrop click (clicking outside the inner panel)
+    if (backdrop) {
+      backdrop.addEventListener('click', closePortal);
+    }
+
+    // Escape key — only fires when the portal is visible
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !portal.classList.contains('fifth-realm-hidden')) {
+        e.stopPropagation(); // prevent the entry screen's Escape handler also firing
+        closePortal();
+      }
+    });
+  }
+
+  // -----------------------------------------------------------------
   // Boot
   // -----------------------------------------------------------------
   function boot() {
@@ -1016,6 +1175,7 @@
     initTweaks();
     initWorldPicker();
     initEntryScreen();
+    initEasterEgg();
     // Start hiding df-messenger chrome as early as possible.
     // This runs in parallel with initChat's openChat call; the
     // re-injection timeouts inside scheduleDfHide + hideDfMessengerChrome

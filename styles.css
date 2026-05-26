@@ -1805,10 +1805,27 @@ body.grimfuture df-messenger {
      (a tall ellipse clipped his head/feet on the sideways angles). */
   width:  clamp(220px, 28vmin, 340px);
   height: clamp(220px, 28vmin, 340px);
-  pointer-events: none;
+  /* Easter egg: the whole medallion is the 7-click target (not just the inner
+     portrait), and the enlarged ::after pad below extends the hit area further.
+     This forfeits compass rotation while the cursor is over the dead-center
+     disc, but card hovers everywhere else are unaffected. */
+  pointer-events: auto;
+  cursor: pointer;
   display: grid;
   place-items: center;
   transition: transform .55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enlarged invisible click pad so the easter egg is easy to hit without
+   landing precisely on the portrait. Sits above the inner layers so the
+   entire disc (plus a generous margin) registers as one big target. */
+.entry-medallion::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 9999px;
+  z-index: 6;
+  cursor: pointer;
 }
 .entry-grid:hover .entry-medallion { transform: translate(-50%, -50%) scale(0.94); }
 .med-ring {
@@ -1846,6 +1863,8 @@ body.grimfuture df-messenger {
   box-shadow: inset 0 0 50px rgba(0,0,0,0.7);
   display: grid;
   place-items: center;
+  /* Interactivity now lives on .entry-medallion (the larger hit target);
+     this inner circle just inherits it and shows the click-pulse feedback. */
 }
 .med-frame img {
   /* Bigger Dan, nudged up so his stomach sits on the rotation pivot —
@@ -2318,4 +2337,648 @@ body.night-city df-messenger {
   --df-messenger-input-box-color:        #1a1a1a;
   --df-messenger-input-font-color:       var(--nc-yellow);
   --df-messenger-minimized-chat-close-icon-color: #0a0a0a;
+}
+
+/* ================================================================
+   EASTER EGG — FIFTH REALM PORTAL
+   Triggered by 7 rapid clicks on .med-frame on the entry screen.
+   Stacks above .entry-screen (z-index: 9999) at z-index: 10000.
+   Colors auto-adapt via var(--bg) / var(--fg) which are already
+   set per body class by the world theme engine in index.js.
+   ================================================================ */
+
+/* ---- Click-pulse feedback on .med-frame (counts 1–6) ---- */
+/* The JS adds/removes .med-frame-pulse on each valid rapid click so
+   the user senses something happening around clicks 3–4. */
+@keyframes med-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+.med-frame.med-frame-pulse {
+  animation: med-pulse 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .med-frame.med-frame-pulse { animation: none !important; }
+}
+
+/* ---- Portal overlay ---- */
+.fifth-realm-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reveal transition — fade + subtle scale-in on the panel */
+  opacity: 1;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hidden state — used both as initial hidden AND as the closing state */
+.fifth-realm-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Reduced-motion: skip the opacity fade */
+@media (prefers-reduced-motion: reduce) {
+  .fifth-realm-portal,
+  .fifth-realm-portal .frp-panel { transition: none !important; }
+}
+
+/* ---- Backdrop ---- */
+.frp-backdrop {
+  position: absolute;
+  inset: 0;
+  /* Semi-transparent fill so the entry-screen shows faintly beneath */
+  background: rgba(0, 0, 0, 0.72);
+  cursor: pointer;
+}
+
+/* ---- Inner panel ---- */
+.frp-panel {
+  position: relative;
+  z-index: 1;
+  /* Auto-theming: background = world bg, color = world fg */
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--fg);
+  max-width: min(680px, 92vw);
+  width: 100%;
+  padding: clamp(36px, 5vw, 64px) clamp(28px, 5vw, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;                /* individual margins on children control spacing */
+  /* Scale-in on reveal */
+  transform: scale(1);
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fifth-realm-hidden .frp-panel {
+  transform: scale(0.92);
+}
+@media (prefers-reduced-motion: reduce) {
+  .frp-panel { transform: none !important; }
+  .fifth-realm-hidden .frp-panel { transform: none !important; }
+}
+
+/* ---- Close button (×) ---- */
+.frp-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 4px 8px;
+  transition: opacity 0.15s ease;
+}
+.frp-close:hover,
+.frp-close:focus-visible { opacity: 1; outline: 1px solid var(--fg); outline-offset: 2px; }
+
+/* ---- D20 glyph ---- */
+.frp-d20 {
+  width: clamp(44px, 6vw, 72px);
+  height: clamp(44px, 6vw, 72px);
+  color: var(--fg);
+  margin-bottom: 22px;
+  opacity: 0.85;
+}
+
+/* ---- Kicker label ---- */
+.frp-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin-bottom: 14px;
+  position: relative;
+  padding: 0 28px;
+}
+/* Hairline rules flanking the kicker */
+.frp-kicker::before,
+.frp-kicker::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 18px; height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.frp-kicker::before { left: 0; }
+.frp-kicker::after  { right: 0; }
+
+/* ---- Headline ---- */
+.frp-headline {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin-bottom: 10px;
+}
+
+/* ---- Headline glitch (chrisunderdown technique, per-world accent channels) ----
+   The real <h2> text stays solid and readable; two clipped pseudo-clones of the
+   text (content: attr(data-text)) jump in horizontal slices with offset, colored
+   text-shadows. The two channel colors come from the active world's palette. */
+.frp-glitch-text {
+  position: relative;
+  --f-size: 15;                /* feeds the slice-cut math below (cancels out) */
+  --frp-ch1: var(--crimson);   /* Arrakis: spice orange */
+  --frp-ch2: #1f4e7a;          /* Arrakis: Fremen blue  */
+  transform: scaleX(var(--scale, 1));
+  animation: frp-glitch-p 11s infinite alternate;
+}
+body.night-city .frp-glitch-text { --frp-ch1: var(--nc-cyan);  --frp-ch2: var(--nc-pink);  } /* cyan / pink            */
+body.oldworld   .frp-glitch-text { --frp-ch1: #7a3aa0;         --frp-ch2: #3f9fb0;          } /* dark-elf violet / moon  */
+body.grimfuture .frp-glitch-text { --frp-ch1: var(--gf-brass); --frp-ch2: var(--gf-ember);  } /* gold / cardinal red     */
+
+.frp-glitch-text::before,
+.frp-glitch-text::after {
+  --top: 0;          /* slice offset from top    [0 – 10]        */
+  --left: 0;         /* horizontal channel shift [-0.083 – 0.083] */
+  --v-height: 30%;   /* visible slice height */
+  --n-tenth: calc(var(--f-size) * 0.1 * var(--top));
+  --t-cut: calc(var(--n-tenth) / var(--f-size) * 100%);
+  --b-cut: calc(var(--t-cut) + var(--v-height));
+
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* data-text carries a newline (&#10;); honor it so the clone breaks
+     "THE FIFTH / REALM" exactly like the visible <br>. */
+  white-space: pre;
+  text-align: center;
+  transform: translateX(calc(var(--left) * 100%));
+  filter: drop-shadow(0 0 transparent);   /* avoids slice pixelization */
+  /* Two RGB-split channels — per active world (replaces the demo's lime/#ff00e1) */
+  text-shadow: calc(var(--left) * -3em) 0 0.02em var(--frp-ch1),
+               calc(var(--left) * -6em) 0 0.02em var(--frp-ch2);
+  background-color: var(--bg);
+  clip-path: polygon(0% var(--t-cut), 100% var(--t-cut), 100% var(--b-cut), 0% var(--b-cut));
+  pointer-events: none;
+}
+.frp-glitch-text::before { animation: frp-glitch-b 1.7s infinite alternate-reverse; }
+.frp-glitch-text::after  { animation: frp-glitch-a 3.1s infinite alternate; }
+
+/* ---- Sub-label ---- */
+.frp-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(13px, 1.8vw, 18px);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 28px;
+}
+
+/* Hairline rule separating the sub-label from the body copy */
+.frp-sub::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  margin: 18px auto 0;
+}
+
+/* ---- Body copy ---- */
+.frp-body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(13px, 1.6vw, 15px);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  opacity: 0.88;
+  max-width: 52ch;
+  margin-bottom: 32px;
+}
+
+/* Old World: swap body copy to the serif italic voice */
+body.oldworld .frp-body {
+  font-family: 'Cormorant Garamond', 'IM Fell English', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(14px, 1.8vw, 16.5px);
+}
+
+/* Grim Future: Cinzel for the body copy gives a litany feel */
+body.grimfuture .frp-body {
+  font-family: 'Cinzel', 'Cormorant SC', serif;
+  font-size: clamp(11.5px, 1.4vw, 13.5px);
+  letter-spacing: 0.04em;
+}
+
+/* ---- CTA button ---- */
+.frp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Anton', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bg);
+  background: var(--fg);
+  padding: 14px 28px;
+  border: 1px solid var(--fg);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  margin-bottom: 26px;
+}
+.frp-cta:hover,
+.frp-cta:focus-visible {
+  background: transparent;
+  color: var(--fg);
+  transform: translateX(3px);
+  outline: none;
+}
+.frp-cta-arrow {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+.frp-cta:hover .frp-cta-arrow { transform: translateX(4px); }
+
+/* Old World: use serif font for the CTA, matching the card CTA style */
+body.oldworld .frp-cta {
+  font-family: 'Cormorant SC', 'IM Fell English SC', serif;
+  letter-spacing: 0.08em;
+}
+
+/* Grim Future: Cinzel for the CTA */
+body.grimfuture .frp-cta {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* ---- Flavor footnote ---- */
+.frp-footnote {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+/* ---- Responsive — tighten on very small viewports ---- */
+@media (max-width: 480px) {
+  .frp-panel { padding: 28px 20px 24px; }
+  .frp-body br { display: none; } /* let copy reflow naturally */
+  .frp-headline { font-size: clamp(38px, 11vw, 60px); }
+}
+
+/* ================================================================
+   EASTER EGG — FIFTH REALM PORTAL — MAGIC PORTAL EFFECTS
+   All colors derive exclusively from var(--fg) and var(--bg) via
+   color-mix(in oklab, …) so they auto-adapt across all four worlds:
+     Arrakis     — burnt-orange fg / sand bg
+     Night City  — yellow fg     / near-black bg
+     Old World   — violet fg     / moonstone bg
+     Grim Future — brass fg      / void bg
+   New layers sit below .frp-panel (z-index ordering) and carry
+   pointer-events: none so close/CTA interactions are never blocked.
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   @keyframes — portal animation vocabulary
+   ---------------------------------------------------------------- */
+
+/* Headline glitch — CSS-variable-driven clip-path slice technique. The real
+   text stays solid + readable; two pseudo-clones show a moving horizontal
+   slice (driven by --top / --left / --v-height, which the keyframes step
+   through) with a per-world two-channel chromatic text-shadow. The element
+   also does a slow horizontal scaleX wobble (frp-glitch-p). */
+@keyframes frp-glitch-p {
+  17% { --scale: .87; }
+  31% { --scale: 1.1; }
+  37% { --scale: 1.3; }
+  47% { --scale: .91; }
+  87% { --scale: 1;   }
+}
+@keyframes frp-glitch-a {
+  10%,30%,50%,70%,90% { --top: 0; --left: 0; }
+  0%   { --v-height: 15%; }
+  20%  { --left: .005; }
+  40%  { --left: .01;  --v-height: 20%; --top: 3; }
+  60%  { --left: .03;  --v-height: 25%; --top: 6; }
+  80%  { --left: .07;  --v-height: 5%;  --top: 8; }
+  100% { --left: .083; --v-height: 30%; --top: 1; }
+}
+@keyframes frp-glitch-b {
+  10%,30%,50%,70%,90% { --top: 0; --left: 0; }
+  0%   { --v-height: 15%; --top: 10; }
+  20%  { --left: -.005; }
+  40%  { --left: -.01;  --v-height: 17%; --top: 3; }
+  60%  { --left: -.03;  --v-height: 35%; --top: 6; }
+  80%  { --left: -.07;  --v-height: 5%;  --top: 8; }
+  100% { --left: -.083; --v-height: 30%; --top: 1; }
+}
+
+/* Counter-clockwise rotation for the outer rune ring */
+@keyframes frp-ring-ccw {
+  to { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* Clockwise rotation at half speed for the mid rune ring */
+@keyframes frp-ring-cw-slow {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Counter-clockwise at double speed for the inner rune ring */
+@keyframes frp-ring-ccw-fast {
+  to { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* Mote drift — matches the existing spice-drift keyframe idiom but
+   carries a gentle lateral sway so motes orbit rather than just rise */
+@keyframes frp-mote-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+  8%   { opacity: 0.95; }
+  50%  { transform: translate3d(28px, -80px, 0) scale(1); opacity: 0.8; }
+  92%  { opacity: 0.55; }
+  100% { transform: translate3d(-12px, -160px, 0) scale(0.5); opacity: 0; }
+}
+
+/* Pulsing halo glow radiating from behind the d20 glyph */
+@keyframes frp-d20-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.45; filter: blur(14px); }
+  50%       { transform: scale(1.22); opacity: 0.72; filter: blur(20px); }
+}
+
+/* Panel reveal shimmer — a bright streak sweeps left-to-right once on open.
+   Applied to .frp-panel::before which starts with clip-path hiding it. */
+@keyframes frp-shimmer-sweep {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0.65; }
+  55%  { clip-path: inset(0 0% 0 0);   opacity: 0.65; }
+  100% { clip-path: inset(0 0% 0 0);   opacity: 0; }
+}
+
+/* Iris/scale reveal: .frp-panel scales from 0.88 → 1 with overshoot.
+   Supplements the existing scale(0.92) → scale(1) by giving an elastic bounce. */
+@keyframes frp-panel-iris {
+  0%   { transform: scale(0.82); }
+  65%  { transform: scale(1.025); }
+  82%  { transform: scale(0.985); }
+  100% { transform: scale(1); }
+}
+
+/* (The swirling vortex aura was removed — the panel now glitches instead.
+   See the .frp-panel glitch rules further down.) */
+
+/* ----------------------------------------------------------------
+   Concentric rune rings
+   Three rings of different sizes, dash patterns, and rotation speeds.
+   Visually matches the .med-ring dashed/dotted ring language on the
+   entry medallion. All positioned absolute, centered in the overlay.
+   ---------------------------------------------------------------- */
+.frp-rune-rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.frp-rune-ring {
+  position: absolute;
+  top:  50%;
+  left: 50%;
+  border-radius: 50%;
+  border-style: dashed;
+  /* Soft neon glow that follows the ring stroke — drop-shadow respects the
+     rendered alpha, so it haloes the dashes rather than the bounding box. */
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--fg) 35%, transparent));
+  /* will-change omitted — transform on the rings already benefits from
+     GPU compositing via the animation; adding will-change for three
+     small absolutely-positioned elements would exceed the benefit. */
+}
+
+/* Outer ring — slow counter-clockwise, loose dash */
+.frp-rune-ring--outer {
+  width:  min(86vw, 86vh);
+  height: min(86vw, 86vh);
+  transform: translate(-50%, -50%);
+  border-width: 1px;
+  border-color: color-mix(in oklab, var(--fg) 32%, transparent);
+  border-style: dashed;
+  animation: frp-ring-ccw 22s linear infinite;
+}
+
+/* Mid ring — medium clockwise, tighter dash */
+.frp-rune-ring--mid {
+  width:  min(68vw, 68vh);
+  height: min(68vw, 68vh);
+  transform: translate(-50%, -50%);
+  border-width: 1px;
+  border-color: color-mix(in oklab, var(--fg) 45%, transparent);
+  border-style: dotted;
+  animation: frp-ring-cw-slow 15s linear infinite;
+}
+
+/* Inner ring — fast counter-clockwise, hairline dash, brighter */
+.frp-rune-ring--inner {
+  width:  min(50vw, 50vh);
+  height: min(50vw, 50vh);
+  transform: translate(-50%, -50%);
+  border-width: 2px;
+  border-color: color-mix(in oklab, var(--fg) 60%, transparent);
+  border-style: dashed;
+  animation: frp-ring-ccw-fast 10s linear infinite;
+}
+
+/* ----------------------------------------------------------------
+   Drifting mote particles
+   Mirrors the .spice-field i idiom: small circles positioned by
+   inline style, animated with staggered durations / delays.
+   The mote container fills the overlay; each mote rises from its
+   inline bottom value.
+   ---------------------------------------------------------------- */
+.frp-motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.frp-motes i {
+  position: absolute;
+  /* Larger than spice-field motes for visibility on a dark backdrop */
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--fg);
+  /* Soft glow ring around each mote via box-shadow.
+     color-mix for the glow so it inherits theme fg. */
+  box-shadow: 0 0 9px 3px color-mix(in oklab, var(--fg) 60%, transparent);
+  opacity: 0;
+  /* Duration and delay are supplied by inline style on each element */
+  animation: frp-mote-drift linear infinite;
+}
+
+/* ----------------------------------------------------------------
+   D20 pulsing halo
+   A softly blurred disc behind the d20 SVG that breathes in and out,
+   creating the impression of magical energy radiating from the glyph.
+   ---------------------------------------------------------------- */
+.frp-d20-halo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reserve the same footprint as the d20 itself (width/height from .frp-d20) */
+  width:  clamp(44px, 6vw, 72px);
+  height: clamp(44px, 6vw, 72px);
+  margin-bottom: 22px;
+}
+
+/* The halo disc — absolutely centered, sits behind the SVG */
+.frp-d20-halo::before {
+  content: "";
+  position: absolute;
+  inset: -60%;            /* oversized so the blur halo bleeds outside the d20 bounds */
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--fg) 78%, transparent);
+  filter: blur(16px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+  animation: frp-d20-pulse 3.2s ease-in-out infinite;
+}
+
+/* Make the SVG float above the halo disc */
+.frp-d20-halo .frp-d20 {
+  position: relative;
+  z-index: 1;
+  /* Override the margin-bottom now that the wrapper handles spacing */
+  margin-bottom: 0;
+}
+
+/* ----------------------------------------------------------------
+   Panel reveal shimmer + iris scale-in
+   The shimmer is a thin bright streak that sweeps across the panel
+   once when the portal opens (plays only once via animation-fill-mode:
+   forwards). The iris uses frp-panel-iris for an elastic bounce.
+
+   IMPORTANT: these animations are tied to the visible state.
+   When .fifth-realm-hidden is removed (portal opens), the panel
+   transitions from scale(0.92) via its existing CSS. We ADD an
+   iris animation on the non-hidden panel so the reveal is springy.
+
+   The shimmer lives on .frp-panel::before — always present but the
+   animation only plays while .fifth-realm-portal:not(.fifth-realm-hidden)
+   is active, so it doesn't loop.
+   ---------------------------------------------------------------- */
+
+/* Shimmer pseudo-element — a translucent diagonal strip.
+   z-index: 0 keeps it above the panel background but below interactive
+   children (.frp-close, .frp-cta) which all auto-stack above. */
+.frp-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in oklab, var(--fg) 18%, transparent) 50%,
+    transparent 70%
+  );
+  /* Start clipped, ready to sweep on open */
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
+}
+
+/* When the portal becomes visible, play the shimmer sweep once */
+.fifth-realm-portal:not(.fifth-realm-hidden) .frp-panel::before {
+  animation: frp-shimmer-sweep 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* CRT scanlines — faint theme-colored horizontal lines across the panel for a
+   glitchy display feel. Static, so it reads on both light and dark worlds
+   (line color derives from --fg). z-index: 0 keeps it above the panel bg but
+   below the interactive children, which auto-stack higher. */
+.frp-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    color-mix(in oklab, var(--fg) 12%, transparent) 2px 3px
+  );
+  opacity: 0.7;
+}
+
+/* When the portal is visible: elastic iris scale-in + persistent glow halo.
+   Both the animation and box-shadow are declared together so neither overrides
+   the other — box-shadow and animation are independent CSS properties. */
+.fifth-realm-portal:not(.fifth-realm-hidden) .frp-panel {
+  /* Elastic bounce scale-in on entrance (the headline glitch carries the
+     "glitchy" motion now — see .frp-glitch-text). */
+  animation: frp-panel-iris 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* Soft layered glow around the panel edge */
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--fg) 60%, transparent),
+    0 0 40px 6px color-mix(in oklab, var(--fg) 28%, transparent),
+    0 0 120px 28px color-mix(in oklab, var(--fg) 14%, transparent);
+}
+
+/* ----------------------------------------------------------------
+   Reduced-motion overrides
+   Under prefers-reduced-motion: all portal animations are disabled.
+   A static faint glow is still applied to the panel so the overlay
+   still reads as "magical" without any motion. Matches the existing
+   @media (prefers-reduced-motion: reduce) block above.
+   ---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .frp-rune-ring,
+  .frp-motes i,
+  .frp-d20-halo::before,
+  .frp-panel::before,
+  .frp-glitch-text,
+  .frp-glitch-text::before,
+  .frp-glitch-text::after,
+  .fifth-realm-portal:not(.fifth-realm-hidden) .frp-panel {
+    animation: none !important;
+  }
+  /* Drop the glitch clones entirely and un-scale the headline so it reads
+     as a clean, static title with no motion. */
+  .frp-glitch-text { transform: none !important; }
+  .frp-glitch-text::before,
+  .frp-glitch-text::after { display: none !important; }
+  /* Restore the static scale so the iris keyframe (which starts at 0.82)
+     does not leave the panel visually shrunk when animation is disabled */
+  .frp-panel {
+    transform: scale(1) !important;
+  }
+  /* Keep the static glow — no motion, just light */
+  .fifth-realm-portal:not(.fifth-realm-hidden) .frp-panel {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--fg) 60%, transparent),
+      0 0 40px 6px color-mix(in oklab, var(--fg) 24%, transparent);
+  }
+  /* Keep the halo visible but static */
+  .frp-d20-halo::before {
+    opacity: 0.5;
+    filter: blur(16px);
+    transform: scale(1);
+  }
 }
