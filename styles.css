@@ -1,6 +1,7 @@
 /* ================================================================
-   DANIMEMES — Arrakis × Night City
+   DANIMEMES — Arrakis × Night City × Old World × Grim Future
    crimson #e40038 / cream #faf3e9 / NC yellow #FFEB0B / NC cyan #00E6F6
+   OW oxblood #1f1430 / vellum #c4bccc — GF brass #c89a3a / void #0a0608
    ================================================================ */
 
 :root {
@@ -16,6 +17,20 @@
   --nc-cyan:   #00E6F6;
   --nc-pink:   #e0287d;
   --nc-bg:     #0a0a0a;
+
+  /* Old World — dark-elf coded: midnight violet, moonstone pale, cruel blood */
+  --ow-oxblood: #1f1430;   /* deep midnight violet (was warm oxblood) */
+  --ow-vellum:  #c4bccc;   /* cold moonstone pale (was warm parchment) */
+  --ow-iron:    #06030a;   /* obsidian black */
+  --ow-gold:    #6e5a82;   /* cold silver-violet (was warm gold) */
+  --ow-blood:   #7a1626;   /* cruel blood accent */
+
+  /* Grim Future — sororitas coded: pitch black, cardinal red, ivory, gold */
+  --gf-void:   #0a0608;    /* pitch with red undertone */
+  --gf-brass:  #c89a3a;    /* sanctified gold */
+  --gf-bone:   #efe4cc;    /* ivory */
+  --gf-ember:  #b81628;    /* cardinal red */
+  --gf-blood:  #5a0a12;    /* deep cardinal */
 
   --bg:   var(--cream);
   --fg:   var(--crimson);
@@ -524,7 +539,7 @@ img { display: block; max-width: 100%; }
   max-width: 52ch;
   /* Reserve room for the longer Night City variant so the stat-grid
      below stays anchored when the user toggles themes. */
-  min-height: 8lh;
+  min-height: 204px;
   text-transform: none;
 }
 
