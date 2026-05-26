@@ -3,15 +3,17 @@
 
   <head>
     <!-- Loading Items -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="styles.css">
-      <script src="index.js"></script> 
       <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-      <script src="index.js"></script>
       <title>Danimemes</title>
-    <!-- Google Dialogflow text -->
+
+    <!-- df-messenger chat widget -->
       <df-messenger
         intent="WELCOME"
         chat-title="BlueSmart"
@@ -20,49 +22,132 @@
         language-code="en"
         expand="true">
       </df-messenger>
-    
+
       <style>
+      /* df-messenger vars — crimson/cream two-tone system. */
       df-messenger {
-      --df-messenger-bot-message: #3EB489;
-      --df-messenger-button-titlebar-color: #3EB489;
-      --df-messenger-chat-background-color: white;
-      --df-messenger-font-color: white;
-      --df-messenger-send-icon: grey;
-      --df-messenger-user-message: #BF40BF;
+        --df-messenger-bot-message: #eb1a4a;
+        --df-messenger-button-titlebar-color: #e40038;
+        --df-messenger-chat-background-color: #faf3e9;
+        --df-messenger-font-color: #faf3e9;
+        --df-messenger-send-icon: #e40038;
+        --df-messenger-user-message: #e40038;
       }
       </style>
+
     <!-- Audio -->
-    <header>
-      <audio id="fade">
-<!--         <source src="audio/Cyberpunk 2077 — Never Fade Away by SAMURAI (Refused).mp3" type="audio/mpeg">
- -->      </audio>
-      
-    </header>
+    <audio id="fade">
+      <!-- <source src="audio/Cyberpunk 2077 — Never Fade Away by SAMURAI (Refused).mp3" type="audio/mpeg"> -->
+    </audio>
   </head>
 
-  
-  <body id="dModeBody" class="body">
-    <!-- Dark Mode switch -->
-      <div class="btnContainer">
-        <div id="lightSwitch" class="absolute btnGlitch" onclick="DarkMode()">
-          Enter Night City 
-        </div>
+  <!-- dModeBody: 'arrakis' (default) | 'night-city' (Night City glitch mode) -->
+  <body id="dModeBody" class="arrakis">
+
+    <!-- ============================================================
+         STICKY NAV
+         data-theme="crimson" = shown over a crimson bg section
+                                → cream text + cream hairline
+         data-theme="cream"   = shown over a cream bg section
+                                → crimson text + crimson hairline
+         ============================================================ -->
+    <nav id="siteNav" class="site-nav" data-theme="crimson" aria-label="Site navigation">
+      <div class="nav-inner">
+        <a href="#section-hero"  class="nav-link">HOME</a>
+        <a href="#section-about" class="nav-link">ABOUT</a>
+        <a href="#section-chat"  class="nav-link">CHAT</a>
       </div>
+      <!-- Night-City toggle lives in the nav so it's always reachable -->
+      <div class="nav-toggle-wrap">
+        <button id="lightSwitch" class="btnJp" onclick="DarkMode()" type="button">
+          ENTER NIGHT CITY
+        </button>
+      </div>
+    </nav>
 
-    <!-- Main Text -->
-      <h1 id="descText1" class="text" data-text="ようこそ　ダンニエルのボットへ">Welcome to the daniel bot.</h1>
-      <div id="descText2" class= "text" data-text="Save us Daniel">You can interact with me using the chatbox in the bottom right.</div>
-    
-      <!-- Dan Images + Video background -->
-      <button class="btn" onclick="DanButton('https://www.facebook.com/daniel.chen.10690')">
-        <img src="image/Cypher.png" class="absolute fullDan danPicTog" id="dan1" alt="Picture of Daniel">
-        <img src="image/DanGlas.png" class="absolute smile" id="dan2" alt="Picture of Daniel">
-        <video autoplay muted loop id="cBg" class="video cBgHide">
-          <source src="image/AcidicInfamousDipper.mp4" type="video/mp4">
-        </video>
-      </button>
+    <!-- ============================================================
+         SECTION 1 — HERO
+         bg: crimson  |  text: cream
+         ============================================================ -->
+    <section id="section-hero" class="page-section section-crimson" data-section-theme="crimson">
+      <!-- Parallax display word — sits behind content, scrolls slow -->
+      <div class="parallax-word" data-parallax-speed="0.35" aria-hidden="true">DANIEL</div>
 
-    <footer id="descText3" class="text">Chatbot built using Google's Dialogflow.</footer>
+      <div class="section-inner hero-inner">
+        <!-- Modular counter -->
+        <span class="section-counter">01 / 03</span>
 
+        <!-- Japanese kicker rendered explicitly so Night City can swap it -->
+        <p class="jp-kicker" id="jpKicker">ようこそ　ダンニエルのボットへ</p>
+
+        <!-- Giant Anton headline — data-text kept for Night City glitch pseudo layers -->
+        <h1 id="descText1" class="headline-hero glitch-text" data-text="ようこそ　ダンニエルのボットへ">
+          WELCOME TO THE DANIEL BOT.
+        </h1>
+
+        <!-- Subtitle -->
+        <p id="descText2" class="subtitle glitch-text" data-text="Save us Daniel">
+          YOU CAN INTERACT WITH ME USING THE CHATBOX IN THE BOTTOM RIGHT.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2 — PORTRAIT / ABOUT
+         bg: cream  |  text: crimson
+         ============================================================ -->
+    <section id="section-about" class="page-section section-cream" data-section-theme="cream">
+      <!-- Parallax display word -->
+      <div class="parallax-word" data-parallax-speed="0.40" aria-hidden="true">CHAT</div>
+
+      <div class="section-inner about-inner">
+        <span class="section-counter">02 / 03</span>
+        <p class="section-label">THE DANIEL BOT</p>
+
+        <!-- Dan portrait with flat 1px crimson hairline frame — btn wrapper preserved -->
+        <button class="btn portrait-btn" aria-label="Daniel photos">
+          <!-- dan1: fullDan / Cypher.png — hidden in Arrakis, shown in Night City -->
+          <img src="image/Cypher.png" class="fullDan danPicTog" id="dan1" alt="Picture of Daniel">
+          <!-- dan2: smile / DanGlas.png — default visible portrait -->
+          <img src="image/DanGlas.png" class="smile portrait-img" id="dan2" alt="Picture of Daniel">
+          <!-- Background video — hidden in Arrakis, revealed in Night City -->
+          <video autoplay muted loop id="cBg" class="video cBgHide">
+            <source src="image/AcidicInfamousDipper.mp4" type="video/mp4">
+          </video>
+        </button>
+
+        <p class="about-blurb">
+          AN AI-POWERED BOT BUILT ON GOOGLE DIALOGFLOW. ASK IT ANYTHING.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3 — CHAT CTA / FOOTER
+         bg: crimson  |  text: cream
+         ============================================================ -->
+    <section id="section-chat" class="page-section section-crimson" data-section-theme="crimson">
+      <!-- Parallax display word -->
+      <div class="parallax-word" data-parallax-speed="0.30" aria-hidden="true">ASK</div>
+
+      <div class="section-inner chat-inner">
+        <span class="section-counter">03 / 03</span>
+
+        <p class="chat-cta-label">START A CONVERSATION</p>
+        <p class="chat-cta-body">
+          OPEN THE CHAT WIDGET IN THE BOTTOM RIGHT TO TALK WITH THE DANIEL BOT.
+        </p>
+
+        <!-- Hairline rule separator -->
+        <hr class="hairline" aria-hidden="true">
+
+        <footer id="descText3" class="site-footer glitch-text" data-text="Chatbot built using Google's Dialogflow.">
+          CHATBOT BUILT USING GOOGLE'S DIALOGFLOW.
+        </footer>
+      </div>
+    </section>
+
+    <!-- Main JS — loaded last so DOM is ready -->
+    <script src="index.js"></script>
   </body>
 </html>

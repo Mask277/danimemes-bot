@@ -1,769 +1,743 @@
-/* Fonts */
-    @font-face {
-        font-family: 'Play-reg';
-        src: url(/Fonts/Play-Regular.ttf);
-    }
+/* ================================================================
+   DANIMEMES — Arrakis + Night City themes
+   Two-color system: crimson #e40038 / cream #faf3e9
+   Fonts: Anton (display), Inter 800 (UI/body), Mochiy Pop One (JP)
+   Hard 0px corners. Flat hairlines. UPPERCASE. Negative letter-spacing.
+   ================================================================ */
 
-    @font-face {
-        font-family: 'Dune';
-        src: url(/Fonts/Dune_Rise.ttf);
-    }
+/* ----------------------------------------------------------------
+   RESET & BASE
+   ---------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* General */
-    .btn {
-        padding: 1;
-        border: none;
-        background: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+html {
+  scroll-behavior: smooth;
+}
 
-    .text {
-        font-family:Dune;
-        padding: 5px;
-    }
+body {
+  background: #faf3e9;
+  color: #e40038;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  overflow-x: hidden;
+}
 
-    footer {
-        margin-top: 10px;
-        text-align: center;
-    }
-    
-    .btnContainer {
-        height: 100px;
-        width: auto;
-        padding-top: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-/* Body */
-    .body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        padding: 10px;
-        background-image: url('https://dunenovels.com/wp-content/uploads/2020/11/WindsofDune-2.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        max-width: 100%;
-        max-height: 100%;
+/* ================================================================
+   STICKY NAV
+   ================================================================ */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 82px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  /* transparent bg — visually picks up the section color behind it */
+  background: transparent;
+  /* color-flip is handled by data-theme attr below */
+  transition: transform 0.25s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
+  /* bottom hairline — color matches text (swapped per theme) */
+  border-bottom: 1px solid currentColor;
+  will-change: transform;
+}
 
-    }
-    .body2 {
-        display: flex;
-        background-color: black;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        padding: 10px;
-    /*  background-image: url('image/Cyber.gif'); */
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        max-width: 100%;
-        max-height: 100%;
-    }
-    .video {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        min-width: 100%;
-        min-height: 100%;
-        z-index: -1;
-    }
+/* Nav hidden: slide off-screen upward */
+.site-nav.nav-hidden {
+  transform: translateY(-100%);
+}
 
-/* Images */
-    .fullDan {
-        height: 100%;
-        width: 50%;
-    }
+/* Color variants driven by IntersectionObserver via JS */
+.site-nav[data-theme="crimson"] {
+  color: #faf3e9;  /* cream text over crimson section */
+}
+.site-nav[data-theme="cream"] {
+  color: #e40038;  /* crimson text over cream section */
+}
 
-    .smile {
-        visibility: visible;
-        width: 50%;
-    }
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
 
-    .cBgHide {
-        visibility: hidden;
-        height: 0;
-        width: 0;
-    }
-    .cyberPic {
-        position: absolute;
-        background-position: center;
-        background-size: cover;
-        width:100%;
-        height:100%;
-    }
-    .absolute {
-        position: relative;
-        background-position: center;
-    }
+.nav-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.08s ease;
+}
 
+.nav-link:hover {
+  border-bottom-color: currentColor;
+}
 
+/* ================================================================
+   PAGE SECTIONS — ALTERNATING FULL-BLEED
+   ================================================================ */
+.page-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;  /* clips the parallax display words at section edges */
+  scroll-margin-top: 82px;  /* anchor jumps clear the fixed nav */
+}
 
-/* Dune Btn https://codepen.io/RazorXio/pen/gMaoOW */ 
-    .button_slide1 {
-        color: black;
-        border: 2px solid #FFEB0B;
-        border-radius: 0px;
-        padding: 18px 36px;
-        display: inline-block;
-        font-family: "Lucida Console", Monaco, monospace;
-        font-size: 14px;
-        letter-spacing: 1px;
-        cursor: pointer;
-        box-shadow: inset 0 0 0 0 #FFEB0B;
-        -webkit-transition: ease-out 0.4s;
-        -moz-transition: ease-out 0.4s;
-        transition: ease-out 0.4s;
-    }
-    .slide_right1:hover {
-        box-shadow: inset 400px 0 0 0 #FFEB0B;
-    }
+.section-crimson {
+  background: #e40038;
+  color: #faf3e9;
+}
 
-    .button_slide2 {
-        background-color: black;
-        color: #FFEB0B;
-        border: 2px solid #FFEB0B;
-        border-radius: 0px;
-        padding: 18px 36px;
-        display: inline-block;
-        font-family: Dune, Monaco, monospace;
-        font-size: 14px;
-        letter-spacing: 1px;
-        cursor: pointer;
-        box-shadow: inset 0 0 0 0 #FFEB0B;
-        -webkit-transition: ease-out 0.4s;
-        -moz-transition: ease-out 0.4s;
-        transition: ease-out 0.4s;
-    }
-    .slide_right2:hover {
-        color: black;
-        box-shadow: inset 400px 0 0 0 #FFEB0B;
-    }
+.section-cream {
+  background: #faf3e9;
+  color: #e40038;
+}
 
-/* Glitch Text https://codepen.io/mattgrosswork/pen/VwprebG */
-    .hero {
-    font-size: clamp(30px, 10vw, 35px);
-    line-height: 1;
-    display: inline-block;
-    color: #FFEB0B;
-    z-index: 2;
-    letter-spacing: 10px;
-    font-family: Play-reg;
+/* Inner content container — centered, max-width ~960px */
+.section-inner {
+  position: relative;
+  z-index: 2;  /* sits above the parallax word */
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 120px 40px 100px;
+}
 
-    /* Bright things in dark environments usually cast that light, giving off a glow */
-    filter: drop-shadow(0 1px 3px);
-    }
+/* First section needs top padding to clear the fixed nav */
+.hero-inner {
+  padding-top: 160px;
+}
 
-    .demo {
-    height: 100px;
-    background: #fff;
-    }
+/* ================================================================
+   SECTION COUNTER & LABELS
+   ================================================================ */
+.section-counter {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
 
-    .layers {
-    position: relative;
-    }
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: inherit;
+  margin-bottom: 40px;
+  opacity: 0.8;
+}
 
-    .layers::before,
-    .layers::after {
-    content: attr(data-text);
-    position: absolute;
-    width: 110%;
-    z-index: -1;
-    }
+/* ================================================================
+   HERO SECTION TYPOGRAPHY
+   ================================================================ */
+.jp-kicker {
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: clamp(18px, 3.5vw, 36px);
+  letter-spacing: -0.02em;
+  color: inherit;
+  text-transform: none;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
 
-    .layers::before {
-    top: 10px;
-    left: 15px;
-    color: #e0287d;
-    }
+.headline-hero {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(48px, 9vw, 120px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: inherit;
+  margin-bottom: 28px;
+}
 
-    .layers::after {
-    top: 5px;
-    left: -10px;
-    color: #1bc7fb;
-    }
+.subtitle {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(14px, 2vw, 17px);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: inherit;
+  max-width: 560px;
+  line-height: 1.4;
+}
 
-    .single-path {
+/* ================================================================
+   ABOUT / PORTRAIT SECTION
+   ================================================================ */
+.portrait-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  display: block;
+  cursor: default;
+  margin-bottom: 32px;
+}
+
+/* The portrait image with 1px crimson hairline frame */
+.portrait-img {
+  display: block;
+  width: clamp(240px, 40%, 420px);
+  border: 1px solid #e40038;
+  border-radius: 0;
+}
+
+.fullDan {
+  display: block;
+  width: clamp(240px, 40%, 420px);
+}
+
+.danPicTog {
+  visibility: hidden;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0;
+  display: block;
+}
+
+.about-blurb {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(14px, 2vw, 17px);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: inherit;
+  max-width: 480px;
+  line-height: 1.4;
+}
+
+/* ================================================================
+   CHAT CTA SECTION
+   ================================================================ */
+.chat-cta-label {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 5vw, 64px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: inherit;
+  margin-bottom: 24px;
+  line-height: 1;
+}
+
+.chat-cta-body {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(14px, 2vw, 17px);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: inherit;
+  max-width: 560px;
+  line-height: 1.4;
+  margin-bottom: 48px;
+}
+
+.hairline {
+  border: none;
+  border-top: 1px solid currentColor;
+  opacity: 0.5;
+  margin-bottom: 40px;
+}
+
+.site-footer {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+
+/* (footer counter removed — the section already shows its own "03 / 03") */
+
+/* ================================================================
+   PARALLAX DISPLAY WORDS
+   These sit absolutely within the section (overflow:hidden clips them),
+   positioned so they straddle the section edge. JS sets translateY.
+   ================================================================ */
+.parallax-word {
+  position: absolute;
+  left: 50%;
+  /* initial center; JS will compute top offset per-word */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(120px, 18vw, 248px);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  color: currentColor;
+  opacity: 0.08;    /* subtle ghost — sits behind content */
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+/* On crimson sections the ghost word uses cream tint;
+   on cream sections it uses a crimson tint.
+   We achieve this by inheriting color from the section. */
+
+/* ================================================================
+   VIDEO BACKGROUND (Night City)
+   ================================================================ */
+.video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+}
+
+.cBgHide {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  position: absolute;
+}
+
+/* ================================================================
+   TOGGLE BUTTON (nav area)
+   ================================================================ */
+.btnJp {
+  background: #faf3e9;
+  color: #e40038;
+  border: 1px solid #faf3e9;
+  border-radius: 0;
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 14px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.btnJp:hover {
+  background: transparent;
+  color: #faf3e9;
+  border-color: #faf3e9;
+}
+
+/* Over a cream section the button inverts */
+.site-nav[data-theme="cream"] .btnJp {
+  background: #e40038;
+  color: #faf3e9;
+  border-color: #e40038;
+}
+
+.site-nav[data-theme="cream"] .btnJp:hover {
+  background: transparent;
+  color: #e40038;
+  border-color: #e40038;
+}
+
+.nav-toggle-wrap {
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   NIGHT CITY TOGGLE BUTTON — "Back to Arrakis" state
+   ================================================================ */
+.btn-night-city {
+  background: #FFEB0B;
+  color: #000;
+  border: 2px solid #FFEB0B;
+  border-radius: 0;
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 14px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  display: inline-block;
+  white-space: nowrap;
+  box-shadow: 4px 0px 0px #00E6F6;
+}
+
+.btn-night-city:hover {
+  background: #000;
+  color: #FFEB0B;
+}
+
+/* ================================================================
+   NIGHT CITY THEME  (.night-city on <body>)
+   Everything inside .night-city overrides Arrakis defaults.
+   ================================================================ */
+
+/* Body base */
+.night-city {
+  background: #000;
+  color: #FFEB0B;
+}
+
+/* Override section colours */
+.night-city .page-section {
+  background: #000 !important;
+  color: #FFEB0B !important;
+}
+
+/* Nav */
+.night-city .site-nav {
+  border-bottom-color: #FFEB0B;
+  color: #FFEB0B !important;
+}
+
+.night-city .site-nav[data-theme] {
+  color: #FFEB0B !important;
+}
+
+.night-city .nav-link {
+  color: #FFEB0B;
+}
+
+/* Parallax words */
+.night-city .parallax-word {
+  color: #FFEB0B !important;
+  opacity: 0.12;
+}
+
+/* Portrait border */
+.night-city .portrait-img {
+  border-color: #FFEB0B;
+  filter: saturate(0.4) contrast(1.2) brightness(0.85);
+}
+
+/* Hairline */
+.night-city .hairline {
+  border-top-color: #FFEB0B;
+}
+
+/* All glitch-text elements get the glitch pseudo-layer treatment */
+.night-city .glitch-text {
+  position: relative;
+  font-family: 'Anton', sans-serif;
+  color: #FFEB0B;
+  filter: drop-shadow(0 1px 3px rgba(0,230,246,0.4));
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.night-city .glitch-text::before,
+.night-city .glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  width: 110%;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+
+.night-city .glitch-text::before {
+  top: 8px;
+  left: 12px;
+  color: #e0287d;
+  animation:
+    nc-paths 5s step-end infinite,
+    nc-opacity 5s step-end infinite,
+    nc-font 8s step-end infinite,
+    nc-movement 10s step-end infinite;
+}
+
+.night-city .glitch-text::after {
+  top: 4px;
+  left: -8px;
+  color: #1bc7fb;
+  animation:
+    nc-paths 5s step-end infinite,
+    nc-opacity 5s step-end infinite,
+    nc-font 7s step-end infinite,
+    nc-movement 8s step-end infinite;
+}
+
+/* Glitch pseudo-layer sits properly above page bg */
+.night-city .headline-hero {
+  line-height: 1.1;
+  font-size: clamp(32px, 7vw, 90px);
+}
+
+.night-city .subtitle {
+  color: #faf3e9;
+  letter-spacing: 2px;
+}
+
+.night-city .jp-kicker {
+  color: #00E6F6;
+}
+
+.night-city .section-counter,
+.night-city .section-label,
+.night-city .about-blurb,
+.night-city .chat-cta-body,
+.night-city .site-footer {
+  color: #faf3e9;
+}
+
+.night-city .chat-cta-label {
+  color: #FFEB0B;
+}
+
+/* Night City section counters */
+.night-city .section-counter {
+  color: #FFEB0B;
+  opacity: 1;
+}
+
+/* Video bg shows in Night City */
+.night-city .cBgHide {
+  visibility: visible;
+  height: auto;
+  width: auto;
+  position: fixed;
+}
+
+/* ================================================================
+   GLITCH KEYFRAMES — Night City pseudo-layers
+   ================================================================ */
+@keyframes nc-paths {
+  0% {
     clip-path: polygon(
-        0% 12%,
-        53% 12%,
-        53% 26%,
-        25% 26%,
-        25% 86%,
-        31% 86%,
-        31% 0%,
-        53% 0%,
-        53% 84%,
-        92% 84%,
-        92% 82%,
-        70% 82%,
-        70% 29%,
-        78% 29%,
-        78% 65%,
-        69% 65%,
-        69% 66%,
-        77% 66%,
-        77% 45%,
-        85% 45%,
-        85% 26%,
-        97% 26%,
-        97% 28%,
-        84% 28%,
-        84% 34%,
-        54% 34%,
-        54% 89%,
-        30% 89%,
-        30% 58%,
-        83% 58%,
-        83% 5%,
-        68% 5%,
-        68% 36%,
-        62% 36%,
-        62% 1%,
-        12% 1%,
-        12% 34%,
-        60% 34%,
-        60% 57%,
-        98% 57%,
-        98% 83%,
-        1% 83%,
-        1% 53%,
-        91% 53%,
-        91% 84%,
-        8% 84%,
-        8% 83%,
-        4% 83%
+      0% 43%, 83% 43%, 83% 22%, 23% 22%, 23% 24%,
+      91% 24%, 91% 26%, 18% 26%, 18% 83%, 29% 83%,
+      29% 17%, 41% 17%, 41% 39%, 18% 39%, 18% 82%,
+      54% 82%, 54% 88%, 19% 88%, 19% 4%, 39% 4%,
+      39% 14%, 76% 14%, 76% 52%, 23% 52%, 23% 35%,
+      19% 35%, 19% 8%, 36% 8%, 36% 31%, 73% 31%,
+      73% 16%, 1% 16%, 1% 56%, 50% 56%, 50% 8%
     );
-    }
+  }
+  5% {
+    clip-path: polygon(
+      0% 29%, 44% 29%, 44% 83%, 94% 83%, 94% 56%,
+      11% 56%, 11% 64%, 94% 64%, 94% 70%, 88% 70%,
+      88% 32%, 18% 32%, 18% 96%, 10% 96%, 10% 62%,
+      9% 62%, 9% 84%, 68% 84%, 68% 50%, 52% 50%,
+      52% 55%, 35% 55%, 35% 87%, 25% 87%, 25% 39%,
+      15% 39%, 15% 88%, 52% 88%
+    );
+  }
+  30% {
+    clip-path: polygon(
+      0% 53%, 93% 53%, 93% 62%, 68% 62%, 68% 37%,
+      97% 37%, 97% 89%, 13% 89%, 13% 45%, 51% 45%,
+      51% 88%, 17% 88%, 17% 54%, 81% 54%, 81% 75%,
+      79% 75%, 79% 76%, 38% 76%, 38% 28%, 61% 28%,
+      61% 12%, 55% 12%, 55% 62%, 68% 62%, 68% 51%,
+      0% 51%, 0% 92%, 63% 92%, 63% 4%, 65% 4%
+    );
+  }
+  45% {
+    clip-path: polygon(
+      0% 33%, 2% 33%, 2% 69%, 58% 69%, 58% 94%,
+      55% 94%, 55% 25%, 33% 25%, 33% 85%, 16% 85%,
+      16% 19%, 5% 19%, 5% 20%, 79% 20%, 79% 96%,
+      93% 96%, 93% 50%, 5% 50%, 5% 74%, 55% 74%,
+      55% 57%, 96% 57%, 96% 59%, 87% 59%, 87% 65%,
+      82% 65%, 82% 39%, 63% 39%, 63% 92%, 4% 92%,
+      4% 36%, 24% 36%, 24% 70%, 1% 70%, 1% 43%,
+      15% 43%, 15% 28%, 23% 28%, 23% 71%, 90% 71%,
+      90% 86%, 97% 86%, 97% 1%, 60% 1%, 60% 67%,
+      71% 67%, 71% 91%, 17% 91%, 17% 14%, 39% 14%,
+      39% 30%, 58% 30%, 58% 11%, 52% 11%, 52% 83%, 68% 83%
+    );
+  }
+  76% {
+    clip-path: polygon(
+      0% 26%, 15% 26%, 15% 73%, 72% 73%, 72% 70%,
+      77% 70%, 77% 75%, 8% 75%, 8% 42%, 4% 42%,
+      4% 61%, 17% 61%, 17% 12%, 26% 12%, 26% 63%,
+      73% 63%, 73% 43%, 90% 43%, 90% 67%, 50% 67%,
+      50% 41%, 42% 41%, 42% 46%, 50% 46%, 50% 84%,
+      96% 84%, 96% 78%, 49% 78%, 49% 25%, 63% 25%, 63% 14%
+    );
+  }
+  90% {
+    clip-path: polygon(
+      0% 41%, 13% 41%, 13% 6%, 87% 6%, 87% 93%,
+      10% 93%, 10% 13%, 89% 13%, 89% 6%, 3% 6%,
+      3% 8%, 16% 8%, 16% 79%, 0% 79%, 0% 99%,
+      92% 99%, 92% 90%, 5% 90%, 5% 60%, 0% 60%,
+      0% 48%, 89% 48%, 89% 13%, 80% 13%, 80% 43%,
+      95% 43%, 95% 19%, 80% 19%, 80% 85%, 38% 85%, 38% 62%
+    );
+  }
+  1%, 7%, 33%, 47%, 78%, 93% {
+    clip-path: none;
+  }
+}
 
-    .paths {
-    animation: paths 5s step-end infinite;
-    }
+@keyframes nc-movement {
+  0%   { transform: translate(-20px, 0px); }
+  15%  { transform: translate(10px, 10px); }
+  60%  { transform: translate(-10px, 5px); }
+  75%  { transform: translate(20px, -5px); }
+  100% { transform: translate(5px, 10px); }
+}
 
-    @keyframes paths {
-    0% {
-        clip-path: polygon(
-        0% 43%,
-        83% 43%,
-        83% 22%,
-        23% 22%,
-        23% 24%,
-        91% 24%,
-        91% 26%,
-        18% 26%,
-        18% 83%,
-        29% 83%,
-        29% 17%,
-        41% 17%,
-        41% 39%,
-        18% 39%,
-        18% 82%,
-        54% 82%,
-        54% 88%,
-        19% 88%,
-        19% 4%,
-        39% 4%,
-        39% 14%,
-        76% 14%,
-        76% 52%,
-        23% 52%,
-        23% 35%,
-        19% 35%,
-        19% 8%,
-        36% 8%,
-        36% 31%,
-        73% 31%,
-        73% 16%,
-        1% 16%,
-        1% 56%,
-        50% 56%,
-        50% 8%
-        );
-    }
+@keyframes nc-opacity {
+  0%  { opacity: 0.1; }
+  5%  { opacity: 0.7; }
+  30% { opacity: 0.4; }
+  45% { opacity: 0.6; }
+  76% { opacity: 0.4; }
+  90% { opacity: 0.8; }
+  1%, 7%, 33%, 47%, 78%, 93% { opacity: 0; }
+}
 
-    5% {
-        clip-path: polygon(
-        0% 29%,
-        44% 29%,
-        44% 83%,
-        94% 83%,
-        94% 56%,
-        11% 56%,
-        11% 64%,
-        94% 64%,
-        94% 70%,
-        88% 70%,
-        88% 32%,
-        18% 32%,
-        18% 96%,
-        10% 96%,
-        10% 62%,
-        9% 62%,
-        9% 84%,
-        68% 84%,
-        68% 50%,
-        52% 50%,
-        52% 55%,
-        35% 55%,
-        35% 87%,
-        25% 87%,
-        25% 39%,
-        15% 39%,
-        15% 88%,
-        52% 88%
-        );
-    }
+@keyframes nc-font {
+  0%  { color: #e0287d; filter: blur(3px); }
+  20% { color: #fff;    filter: blur(0);   }
+  50% { color: #1bc7fb; filter: blur(2px); }
+  60% { color: #fff;    filter: blur(0);   }
+  90% { color: #e0287d; filter: blur(6px); }
+}
 
-    30% {
-        clip-path: polygon(
-        0% 53%,
-        93% 53%,
-        93% 62%,
-        68% 62%,
-        68% 37%,
-        97% 37%,
-        97% 89%,
-        13% 89%,
-        13% 45%,
-        51% 45%,
-        51% 88%,
-        17% 88%,
-        17% 54%,
-        81% 54%,
-        81% 75%,
-        79% 75%,
-        79% 76%,
-        38% 76%,
-        38% 28%,
-        61% 28%,
-        61% 12%,
-        55% 12%,
-        55% 62%,
-        68% 62%,
-        68% 51%,
-        0% 51%,
-        0% 92%,
-        63% 92%,
-        63% 4%,
-        65% 4%
-        );
-    }
+/* ================================================================
+   BTN GLITCH — Night City hover effect on toggle
+   ================================================================ */
+.btn-night-city::after {
+  --slice-0: inset(50% 50% 50% 50%);
+  --slice-1: inset(80% -6px 0 0);
+  --slice-2: inset(50% -6px 30% 0);
+  --slice-3: inset(10% -6px 85% 0);
+  --slice-4: inset(40% -6px 43% 0);
+  --slice-5: inset(80% -6px 5% 0);
+  content: 'BACK TO ARRAKIS';
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(45deg, transparent 3%, #00E6F6 3%, #00E6F6 5%, #FFEB0B 5%);
+  text-shadow: -3px -3px 0px #F8F005, 3px 3px 0px #00E6F6;
+  clip-path: var(--slice-0);
+}
 
-    45% {
-        clip-path: polygon(
-        0% 33%,
-        2% 33%,
-        2% 69%,
-        58% 69%,
-        58% 94%,
-        55% 94%,
-        55% 25%,
-        33% 25%,
-        33% 85%,
-        16% 85%,
-        16% 19%,
-        5% 19%,
-        5% 20%,
-        79% 20%,
-        79% 96%,
-        93% 96%,
-        93% 50%,
-        5% 50%,
-        5% 74%,
-        55% 74%,
-        55% 57%,
-        96% 57%,
-        96% 59%,
-        87% 59%,
-        87% 65%,
-        82% 65%,
-        82% 39%,
-        63% 39%,
-        63% 92%,
-        4% 92%,
-        4% 36%,
-        24% 36%,
-        24% 70%,
-        1% 70%,
-        1% 43%,
-        15% 43%,
-        15% 28%,
-        23% 28%,
-        23% 71%,
-        90% 71%,
-        90% 86%,
-        97% 86%,
-        97% 1%,
-        60% 1%,
-        60% 67%,
-        71% 67%,
-        71% 91%,
-        17% 91%,
-        17% 14%,
-        39% 14%,
-        39% 30%,
-        58% 30%,
-        58% 11%,
-        52% 11%,
-        52% 83%,
-        68% 83%
-        );
-    }
+.btn-night-city {
+  position: relative;
+}
 
-    76% {
-        clip-path: polygon(
-        0% 26%,
-        15% 26%,
-        15% 73%,
-        72% 73%,
-        72% 70%,
-        77% 70%,
-        77% 75%,
-        8% 75%,
-        8% 42%,
-        4% 42%,
-        4% 61%,
-        17% 61%,
-        17% 12%,
-        26% 12%,
-        26% 63%,
-        73% 63%,
-        73% 43%,
-        90% 43%,
-        90% 67%,
-        50% 67%,
-        50% 41%,
-        42% 41%,
-        42% 46%,
-        50% 46%,
-        50% 84%,
-        96% 84%,
-        96% 78%,
-        49% 78%,
-        49% 25%,
-        63% 25%,
-        63% 14%
-        );
-    }
+.btn-night-city:hover::after {
+  animation: nc-btn-glitch 1s steps(2, end);
+}
 
-    90% {
-        clip-path: polygon(
-        0% 41%,
-        13% 41%,
-        13% 6%,
-        87% 6%,
-        87% 93%,
-        10% 93%,
-        10% 13%,
-        89% 13%,
-        89% 6%,
-        3% 6%,
-        3% 8%,
-        16% 8%,
-        16% 79%,
-        0% 79%,
-        0% 99%,
-        92% 99%,
-        92% 90%,
-        5% 90%,
-        5% 60%,
-        0% 60%,
-        0% 48%,
-        89% 48%,
-        89% 13%,
-        80% 13%,
-        80% 43%,
-        95% 43%,
-        95% 19%,
-        80% 19%,
-        80% 85%,
-        38% 85%,
-        38% 62%
-        );
-    }
+@keyframes nc-btn-glitch {
+  0%   { clip-path: var(--slice-1); transform: translate(-20px, -10px); }
+  10%  { clip-path: var(--slice-3); transform: translate(10px, 10px);   }
+  20%  { clip-path: var(--slice-1); transform: translate(-10px, 10px);  }
+  30%  { clip-path: var(--slice-3); transform: translate(0px, 5px);     }
+  40%  { clip-path: var(--slice-2); transform: translate(-5px, 0px);    }
+  50%  { clip-path: var(--slice-3); transform: translate(5px, 0px);     }
+  60%  { clip-path: var(--slice-4); transform: translate(5px, 10px);    }
+  70%  { clip-path: var(--slice-2); transform: translate(-10px, 10px);  }
+  80%  { clip-path: var(--slice-5); transform: translate(20px, -10px);  }
+  90%  { clip-path: var(--slice-1); transform: translate(-10px, 0px);   }
+  100% { clip-path: var(--slice-1); transform: translate(0);            }
+}
 
-    1%,
-    7%,
-    33%,
-    47%,
-    78%,
-    93% {
-        clip-path: none;
-    }
-    }
+/* ================================================================
+   PREFERS-REDUCED-MOTION
+   Disable parallax translateY transitions and nav slide animation.
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav {
+    transition: none;
+  }
+  .parallax-word {
+    /* JS checks this and skips parallax updates */
+  }
+  .night-city .glitch-text::before,
+  .night-city .glitch-text::after {
+    animation: none;
+    display: none;
+  }
+  .btn-night-city:hover::after {
+    animation: none;
+  }
+}
 
-    .movement {
-    /* Normally this position would be absolute & on the layers, set to relative here so we can see it on the div */
-    position: absolute;
-    animation: movement 8s step-end infinite;
-    }
+/* ================================================================
+   MOBILE BREAKPOINTS
+   ================================================================ */
+@media only screen and (max-width: 768px) {
+  .site-nav {
+    padding: 0 20px;
+    height: 64px;
+  }
 
-    @keyframes movement {
-    0% {
-        top: 0px;
-        left: -20px;
-    }
+  .nav-inner {
+    gap: 20px;
+  }
 
-    15% {
-        top: 10px;
-        left: 10px;
-    }
+  .nav-link {
+    font-size: 12px;
+  }
 
-    60% {
-        top: 5px;
-        left: -10px;
-    }
+  .btnJp,
+  .btn-night-city {
+    font-size: 11px;
+    padding: 8px 14px;
+  }
 
-    75% {
-        top: -5px;
-        left: 20px;
-    }
+  .section-inner {
+    padding: 80px 20px 72px;
+  }
 
-    100% {
-        top: 10px;
-        left: 5px;
-    }
-    }
+  .hero-inner {
+    padding-top: 100px;
+  }
 
-    .opacity {
-    animation: opacity 5s step-end infinite;
-    }
+  .page-section {
+    scroll-margin-top: 64px;  /* mobile nav is shorter */
+  }
 
-    @keyframes opacity {
-    0% {
-        opacity: 0.1;
-    }
+  .portrait-img,
+  .fullDan {
+    width: 100%;
+    max-width: 340px;
+  }
 
-    5% {
-        opacity: 0.7;
-    }
+  .video {
+    position: fixed;
+    height: 400px;
+    width: 400px;
+    right: auto;
+    bottom: auto;
+  }
 
-    30% {
-        opacity: 0.4;
-    }
+  .parallax-word {
+    font-size: clamp(80px, 22vw, 140px);
+  }
+}
 
-    45% {
-        opacity: 0.6;
-    }
+/* Legacy font-face entries kept for any residual references */
+@font-face {
+  font-family: 'Play-reg';
+  src: url(/Fonts/Play-Regular.ttf);
+}
 
-    76% {
-        opacity: 0.4;
-    }
-
-    90% {
-        opacity: 0.8;
-    }
-
-    1%,
-    7%,
-    33%,
-    47%,
-    78%,
-    93% {
-        opacity: 0;
-    }
-    }
-
-    .font {
-    animation: font 7s step-end infinite;
-    }
-
-    @keyframes font {
-    0% {
-        font-weight: 100;
-        color: #e0287d;
-        filter: blur(3px);
-    }
-
-    20% {
-        font-weight: 500;
-        color: #fff;
-        filter: blur(0);
-    }
-
-    50% {
-        font-weight: 300;
-        color: #1bc7fb;
-        filter: blur(2px);
-    }
-
-    60% {
-        font-weight: 700;
-        color: #fff;
-        filter: blur(0);
-    }
-
-    90% {
-        font-weight: 500;
-        color: #e0287d;
-        filter: blur(6px);
-    }
-    }
-
-    .glitch span {
-    animation: paths 5s step-end infinite;
-    }
-
-    .glitch::before {
-    animation: paths 5s step-end infinite, opacity 5s step-end infinite,
-        font 8s step-end infinite, movement 10s step-end infinite;
-    }
-
-    .glitch::after {
-    animation: paths 5s step-end infinite, opacity 5s step-end infinite,
-        font 7s step-end infinite, movement 8s step-end infinite;
-    }
-
-    .hero-container {
-    position: relative;
-    padding: 200px 0;
-    text-align: center;
-    }
-
-/* Mobile breakpoints */
-    @media only screen and (max-width: 768px) {
-
-        .hero {
-            letter-spacing: 0px;
-            font-size: clamp(15px, 10vw, 25px);
-        }
-
-        .body {
-            overflow: hidden;
-            margin-top: 100px;
-        }
-
-        .body2 {
-            padding: 0;
-            max-width: 100%;
-            overflow: hidden;
-            margin-top: 100px;
-        }
-        .smile {
-            width: 100%;
-            padding-top: 50%;
-        }
-        .btn {
-            justify-content: flex-end;
-            max-height: 600px;
-        }
-        .video {
-            position: absolute;
-            right: auto;
-            bottom: auto;
-            overflow: hidden;
-            min-width: none;
-            min-height: auto;
-            height: 400px;
-            width: 400px;
-        }
-        .fullDan {
-            height: 350px;
-            width: 400px;
-        }
-        footer {
-            font-size: 15px;
-        }
-    }
-
-/* Rules */
-    .danPicTog {
-            visibility: hidden;
-            width: 0;
-            height: 0;
-            padding: 0;
-    }
-/* Glitch Btn https://codepen.io/stevenlei/pen/ZEpyBod */
-    .btnGlitch, .btnGlitch::after {
-        width: 340px;
-        height: 86px;
-        font-size: 30px;
-        font-family: 'Lucida Console';
-        background: linear-gradient(45deg, transparent 5%, #FFEB0B 5%);
-        border: 5px;
-        letter-spacing: 3px;
-        line-height: 88px;
-        outline: transparent;
-        position: relative;
-        padding-left: 10px;
-        box-shadow: 6px 0px 0px #00E6F6;
-        }
-
-        .btnGlitch::after {
-        --slice-0: inset(50% 50% 50% 50%);
-        --slice-1: inset(80% -6px 0 0);
-        --slice-2: inset(50% -6px 30% 0);
-        --slice-3: inset(10% -6px 85% 0);
-        --slice-4: inset(40% -6px 43% 0);
-        --slice-5: inset(80% -6px 5% 0);
-
-        content: 'Enter Night City';
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(45deg, transparent 3%, #00E6F6 3%, #00E6F6 5%, #FFEB0B 5%);
-        text-shadow: -3px -3px 0px #F8F005, 3px 3px 0px #00E6F6;
-        clip-path: var(--slice-0);
-        }
-
-        .btnGlitch:hover::after {
-        animation: 1s glitch;
-        animation-timing-function: steps(2, end);
-        }
-
-        @keyframes glitch {
-        0% {
-            clip-path: var(--slice-1);
-            transform: translate(-20px, -10px);
-        }
-        10% {
-            clip-path: var(--slice-3);
-            transform: translate(10px, 10px);
-        }
-        20% {
-            clip-path: var(--slice-1);
-            transform: translate(-10px, 10px);
-        }
-        30% {
-            clip-path: var(--slice-3);
-            transform: translate(0px, 5px);
-        }
-        40% {
-            clip-path: var(--slice-2);
-            transform: translate(-5px, 0px);
-        }
-        50% {
-            clip-path: var(--slice-3);
-            transform: translate(5px, 0px);
-        }
-        60% {
-            clip-path: var(--slice-4);
-            transform: translate(5px, 10px);
-        }
-        70% {
-            clip-path: var(--slice-2);
-            transform: translate(-10px, 10px);
-        }
-        80% {
-            clip-path: var(--slice-5);
-            transform: translate(20px, -10px);
-        }
-        90% {
-            clip-path: var(--slice-1);
-            transform: translate(-10px, 0px);
-        }
-        100% {
-            clip-path: var(--slice-1);
-            transform: translate(0);
-        }
-        }
+@font-face {
+  font-family: 'Dune';
+  src: url(/Fonts/Dune_Rise.ttf);
+}
