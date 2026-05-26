@@ -32,7 +32,12 @@
       <a href="#chat" class="nav-link"><span class="nav-link-num">04</span>CHAT</a>
     </div>
 
-    <button id="ncToggle" class="btn-nc-toggle" type="button">ENTER NIGHT CITY</button>
+    <div class="world-picker" role="tablist" aria-label="World">
+      <button class="world-btn" data-world="arrakis"    role="tab"><span class="lbl-full">ARRAKIS</span><span class="lbl-short">ARR</span></button>
+      <button class="world-btn" data-world="night-city" role="tab"><span class="lbl-full">NIGHT CITY</span><span class="lbl-short">N.C.</span></button>
+      <button class="world-btn" data-world="oldworld"   role="tab"><span class="lbl-full">OLD WORLD</span><span class="lbl-short">O.W.</span></button>
+      <button class="world-btn" data-world="grimfuture" role="tab"><span class="lbl-full">GRIM FUTURE</span><span class="lbl-short">G.F.</span></button>
+    </div>
   </nav>
 
   <!-- ============================================================
@@ -497,13 +502,15 @@
     <div class="tweaks-body">
       <div class="tweaks-row">
         <label>WORLD</label>
-        <div class="seg" data-seg="theme">
+        <div class="seg seg-grid" data-seg="theme">
           <button data-val="arrakis">ARRAKIS</button>
           <button data-val="night-city">NIGHT CITY</button>
+          <button data-val="oldworld">OLD WORLD</button>
+          <button data-val="grimfuture">GRIM FUTURE</button>
         </div>
       </div>
 
-      <div class="tweaks-row">
+      <div class="tweaks-row" data-tweak-show="arrakis">
         <label>PALETTE (ARRAKIS)</label>
         <div class="swatches">
           <div class="swatch" data-accent="crimson" style="background:#c8541a" title="Spice"></div>
@@ -511,6 +518,26 @@
           <div class="swatch" data-accent="ink"     style="background:#1c130a" title="Sietch Ink"></div>
           <div class="swatch" data-accent="navy"    style="background:#1f4e7a" title="Fremen Blue"></div>
           <div class="swatch" data-accent="olive"   style="background:#3a4a1e" title="Olive"></div>
+        </div>
+      </div>
+
+      <div class="tweaks-row" data-tweak-show="oldworld">
+        <label>PALETTE (DARK KIN)</label>
+        <div class="swatches">
+          <div class="swatch" data-accent="oxblood" style="background:#1f1430" title="Midnight Violet"></div>
+          <div class="swatch" data-accent="forest"  style="background:#0e1d18" title="Sea-Elf Green"></div>
+          <div class="swatch" data-accent="iron"    style="background:#06030a" title="Obsidian"></div>
+          <div class="swatch" data-accent="royal"   style="background:#161a3a" title="Sapphire Dark"></div>
+        </div>
+      </div>
+
+      <div class="tweaks-row" data-tweak-show="grimfuture">
+        <label>PALETTE (SISTERHOOD)</label>
+        <div class="swatches">
+          <div class="swatch" data-accent="brass"   style="background:#c89a3a" title="Sanctified Gold"></div>
+          <div class="swatch" data-accent="ember"   style="background:#b81628" title="Cardinal Red"></div>
+          <div class="swatch" data-accent="bone"    style="background:#efe4cc" title="Ivory"></div>
+          <div class="swatch" data-accent="void"    style="background:#7894b8" title="Ice Blue"></div>
         </div>
       </div>
 
@@ -523,7 +550,7 @@
         </div>
       </div>
 
-      <div class="tweaks-row">
+      <div class="tweaks-row" data-tweak-show="night-city">
         <label>GLITCH INTENSITY (NIGHT CITY)</label>
         <input id="glitchSlider" type="range" min="0" max="3" step="0.1" value="1" />
       </div>
