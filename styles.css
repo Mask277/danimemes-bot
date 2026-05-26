@@ -263,9 +263,14 @@ img { display: block; max-width: 100%; }
   padding-top: clamp(120px, 18vh, 220px);
 }
 /* Reserve worst-case line space for the variable-length copy so a
-   2-line vs 3-line wrap doesn't push the CTA row down. */
-#heroKicker { min-height: 1.6em; display: inline-flex; align-items: center; }
-#heroSub { min-height: calc(1.45em * 3); }
+   2-line vs 3-line wrap doesn't push the CTA row down.
+   Use absolute px (not em/lh) per STYLING_LEARNINGS.md #14 — em shrinks with
+   the element's own font-size in OW/GF where fonts are smaller. */
+#heroKicker   { min-height: 26px; display: inline-flex; align-items: center; }
+#heroSub      { min-height: 78px; }
+/* Reserve 1 line of the LARGEST variant (Arrakis Anton clamp) so OW/GF
+   headline (shrunk to keep wrap-count equal) still reserves enough px. */
+#heroHeadline { min-height: calc(clamp(52px, 12vw, 180px) * 1.025); }
 
 /* Anchor the CTA row so the worm-ring and secondary button don't
    slide horizontally when the primary label shortens ("SUMMON THE BOT"
@@ -297,6 +302,7 @@ img { display: block; max-width: 100%; }
   font-size: 12px; font-weight: 500;
   letter-spacing: 0.06em; text-transform: uppercase;
   opacity: 0.75;
+  min-height: 18px;
 }
 .section-header .counter { font-variant-numeric: tabular-nums; }
 .section-header .meta { display: flex; gap: 18px; }
@@ -376,6 +382,64 @@ img { display: block; max-width: 100%; }
   transform-origin: top;
 }
 @keyframes scroll-bar { 0%, 100% { transform: scaleY(0.2); } 50% { transform: scaleY(1); } }
+
+/* ================================================================
+   WORLD PICKER — 4-way segmented control in the top nav
+   ================================================================ */
+.world-picker {
+  display: flex;
+  border: var(--hair) solid currentColor;
+  font-family: 'Anton', sans-serif;
+}
+.world-picker .world-btn {
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border: none;
+  border-right: var(--hair) solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.world-picker .world-btn:last-child { border-right: none; }
+.world-picker .world-btn:hover { background: color-mix(in oklab, currentColor 12%, transparent); }
+
+/* Active state — explicit bg + fg values per theme (currentColor is live
+   and tracks `color`, so setting both `background: currentColor` AND
+   `color: X` makes the button invisible — bg follows the color change).
+   Per STYLING_LEARNINGS.md #11: never use currentColor on background when
+   also overriding color on the same element. */
+.site-nav[data-theme="crimson"] .world-picker .world-btn.active { background: var(--cream);       color: var(--crimson); }
+.site-nav[data-theme="cream"]   .world-picker .world-btn.active { background: var(--crimson);     color: var(--cream); }
+body.night-city .site-nav[data-theme="crimson"] .world-picker .world-btn.active { background: var(--nc-yellow); color: var(--nc-bg); }
+body.night-city .site-nav[data-theme="cream"]   .world-picker .world-btn.active { background: var(--nc-bg);     color: var(--nc-yellow); }
+body.oldworld   .site-nav[data-theme="crimson"] .world-picker .world-btn.active { background: var(--ow-vellum);  color: var(--ow-oxblood); }
+body.oldworld   .site-nav[data-theme="cream"]   .world-picker .world-btn.active { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.grimfuture .site-nav[data-theme="crimson"] .world-picker .world-btn.active { background: var(--gf-brass);  color: var(--gf-void); }
+body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active { background: var(--gf-void);   color: var(--gf-brass); }
+
+/* Default: show full label, hide short. Switch at breakpoints.
+   Per STYLING_LEARNINGS.md #12: use real DOM spans, not ::before/::after content
+   on <button> elements — pseudo-content on form controls is unreliable. */
+.world-picker .world-btn .lbl-short { display: none; }
+.world-picker .world-btn .lbl-full  { display: inline; }
+
+/* Abbreviate world labels at narrower widths so the picker fits the nav. */
+@media (max-width: 1180px) {
+  .world-picker .world-btn { padding: 8px 9px; font-size: 10px; }
+}
+@media (max-width: 980px) {
+  .world-picker .world-btn .lbl-full  { display: none; }
+  .world-picker .world-btn .lbl-short { display: inline; }
+  .world-picker .world-btn { padding: 8px 11px; font-size: 11px; letter-spacing: 0.04em; }
+}
+@media (max-width: 720px) {
+  .nav-inner { display: none; }  /* hide center nav at very small widths so picker has room */
+}
 
 /* ================================================================
    BUTTONS
@@ -557,7 +621,7 @@ img { display: block; max-width: 100%; }
   padding: 18px 20px;
   display: flex; flex-direction: column;
   gap: 8px;
-  min-height: 96px;
+  min-height: 120px;
 }
 .stat-label {
   font-family: 'JetBrains Mono', monospace;
@@ -589,6 +653,9 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 1.02;
+  /* "ASK ME<br>ANYTHING" always wraps to 2 lines via explicit <br>.
+     Reserve 2 lines of arr Anton so OW/GF (smaller font) don't shift. */
+  min-height: calc(clamp(48px, 8vw, 128px) * 2 * 1.02);
 }
 .cap-blurb {
   font-family: 'Inter', sans-serif;
@@ -597,6 +664,7 @@ img { display: block; max-width: 100%; }
   font-size: 16px; line-height: 1.5;
   letter-spacing: -0.01em;
   max-width: 42ch;
+  min-height: 96px;
 }
 
 .accordion { border-top: var(--hair) solid currentColor; }
@@ -613,6 +681,8 @@ img { display: block; max-width: 100%; }
   align-items: baseline;
   padding: 22px var(--section-pad-x);
   margin: 0 calc(-1 * var(--section-pad-x));
+  min-height: 76px;
+  box-sizing: border-box;
 }
 .acc-num {
   font-family: 'JetBrains Mono', monospace;
@@ -754,6 +824,10 @@ img { display: block; max-width: 100%; }
   letter-spacing: -0.04em;
   line-height: 1.0;
   margin-bottom: 24px;
+  /* "TALK TO<br>DAN-BOT." always wraps to 2 lines via explicit <br>.
+     Reserve 2 lines of the largest font (arr Anton) so OW/GF don't
+     pull the chat window upward. */
+  min-height: calc(clamp(56px, 9vw, 140px) * 2);
 }
 .chat-pitch p {
   font-family: 'Inter', sans-serif;
@@ -764,6 +838,7 @@ img { display: block; max-width: 100%; }
   text-transform: none;
   margin-bottom: 24px;
   max-width: 46ch;
+  min-height: 102px;
 }
 .chat-suggestions {
   display: flex; flex-wrap: wrap; gap: 8px;
@@ -910,6 +985,7 @@ img { display: block; max-width: 100%; }
   gap: 48px;
   border-top: var(--hair) solid currentColor;
   padding-top: 48px;
+  min-height: 220px;
 }
 .foot-label {
   font-family: 'JetBrains Mono', monospace;
@@ -1129,6 +1205,497 @@ body.night-city .tweaks-row .swatch.active::after { border-color: var(--nc-bg); 
   .acc-body > div { grid-template-columns: 60px 1fr; gap: 14px; }
   .tweaks-panel { right: 12px; bottom: 12px; width: calc(100vw - 24px); max-width: 320px; }
   .stat-grid { grid-template-columns: 1fr; }
+}
+
+/* ================================================================
+   TWEAKS PANEL — 4-world grid seg + data-tweak-show visibility
+   ================================================================ */
+/* 4-button world seg laid out as 2×2 grid */
+.tweaks-row .seg.seg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.tweaks-row .seg.seg-grid button {
+  border-right: var(--hair) solid currentColor;
+  border-bottom: var(--hair) solid currentColor;
+  padding: 10px 6px;
+  font-size: 11px;
+}
+.tweaks-row .seg.seg-grid button:nth-child(2n) { border-right: none; }
+.tweaks-row .seg.seg-grid button:nth-child(n+3) { border-bottom: none; }
+
+/* Hide palette/glitch rows when their theme isn't active */
+.tweaks-row[data-tweak-show] { display: none; }
+body.arrakis    .tweaks-row[data-tweak-show="arrakis"]    { display: flex; flex-direction: column; gap: 6px; }
+body.night-city .tweaks-row[data-tweak-show="night-city"] { display: flex; flex-direction: column; gap: 6px; }
+body.oldworld   .tweaks-row[data-tweak-show="oldworld"]   { display: flex; flex-direction: column; gap: 6px; }
+body.grimfuture .tweaks-row[data-tweak-show="grimfuture"] { display: flex; flex-direction: column; gap: 6px; }
+
+/* Per-theme tweaks panel theming */
+body.oldworld   .tweaks-panel { background: var(--ow-vellum);  color: var(--ow-oxblood); border-color: var(--ow-iron); }
+body.grimfuture .tweaks-panel { background: #1d1812;           color: var(--gf-brass);   border-color: var(--gf-brass); }
+body.oldworld   .tweaks-row .seg button.active { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.grimfuture .tweaks-row .seg button.active { background: var(--gf-brass);   color: var(--gf-void); }
+body.oldworld   .tweaks-row .swatch.active::after { border-color: var(--ow-vellum); }
+body.grimfuture .tweaks-row .swatch.active::after { border-color: var(--gf-void); }
+
+/* ================================================================
+   THEME-AWARE HERO ORNAMENT
+   - Each theme shows ONE glyph (worm-ring / reticle / heraldic seal / cog)
+   - Default to Arrakis worm-ring; other glyphs hidden until their world is active
+   - NOTE: .hero-ornament markup is added in Stage 5. These rules are
+     harmless until then — hero still renders with existing .worm-ring.
+   ================================================================ */
+.hero-ornament {
+  display: inline-flex;
+  width: 84px; height: 84px;
+  position: relative;
+  flex-shrink: 0;
+  color: currentColor;
+}
+.hero-ornament .orn {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  display: none;
+  opacity: 0.85;
+}
+.hero-ornament .orn-arr { display: block; }
+body.night-city .hero-ornament .orn      { display: none; }
+body.night-city .hero-ornament .orn-nc   { display: block; opacity: 0.9; }
+body.oldworld   .hero-ornament .orn      { display: none; }
+body.oldworld   .hero-ornament .orn-ow   { display: block; opacity: 0.95; }
+body.grimfuture .hero-ornament .orn      { display: none; }
+body.grimfuture .hero-ornament .orn-gf   { display: block; opacity: 0.9; }
+
+/* ================================================================
+   LAYOUT STABILITY RESERVATIONS — zero-shift across all 4 worlds
+   ----------------------------------------------------------------
+   All elements here had observable height drift when cycling worlds
+   (different fonts + per-theme copy of different lengths).
+   Reservations use ABSOLUTE units (not em/lh) because those shrink
+   with the element's own font-size in OW/GF (#14 in STYLING_LEARNINGS).
+   ================================================================ */
+
+/* Stat-value: OW serif + GF Cinzel render larger glyphs at same px.
+   Shrink so 1-line values stay 1-line and don't push layout. */
+body.oldworld   .stat-value { font-size: 14px; letter-spacing: 0; }
+body.grimfuture .stat-value { font-size: 13px; letter-spacing: 0.04em; }
+
+/* Stat-label: similar treatment across OW/GF */
+body.oldworld   .stat-label,
+body.grimfuture .stat-label { font-size: 10px; }
+
+/* Subtitle: OW italic + GF mono copy needs same metric box as arr/nc Anton */
+body.oldworld   .subtitle,
+body.grimfuture .subtitle { font-size: 15px; line-height: 1.55; }
+
+/* ================================================================
+   OLD WORLD MODE — grimdark gothic fantasy
+   Midnight violet sections, moonstone pale type, cruel blood accents.
+   ================================================================ */
+body.oldworld {
+  --bg: var(--ow-vellum);
+  --fg: var(--ow-oxblood);
+  background: var(--ow-vellum);
+  color: var(--ow-oxblood);
+}
+
+/* Section flip: crimson-section becomes oxblood; cream-section becomes vellum */
+body.oldworld .section-crimson {
+  background: var(--ow-oxblood) !important;
+  color: var(--ow-vellum) !important;
+  background-image:
+    radial-gradient(circle at 22% 30%, rgba(26,22,18,0.18) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 68% 72%, rgba(26,22,18,0.15) 0 1.5px, transparent 2px),
+    radial-gradient(ellipse 80% 30% at 50% 0%, rgba(26,22,18,0.45), transparent 70%),
+    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(26,22,18,0.45), transparent 70%),
+    repeating-linear-gradient(92deg, rgba(26,22,18,0.06) 0 1px, transparent 1px 110px);
+  background-size: 220px 220px, 280px 280px, 100% 100%, 100% 100%, 100% 100%;
+}
+body.oldworld .section-cream {
+  background: var(--ow-vellum) !important;
+  color: var(--ow-oxblood) !important;
+  background-image:
+    /* parchment fiber/grain */
+    radial-gradient(circle at 14% 18%, rgba(60,30,20,0.08) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 64%, rgba(60,30,20,0.06) 0 1px, transparent 2px),
+    radial-gradient(circle at 41% 88%, rgba(60,30,20,0.05) 0 1px, transparent 2px),
+    /* faint horizontal scribe lines */
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(60,30,20,0.04) 39px 40px),
+    /* vignette of age — darker toward edges */
+    radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(80,40,20,0.10) 100%);
+  background-size: 240px 240px, 320px 320px, 200px 200px, 100% 100%, 100% 100%;
+}
+body.oldworld .site-nav,
+body.oldworld .site-nav[data-theme] {
+  border-bottom-color: var(--ow-iron) !important;
+}
+body.oldworld .site-nav[data-theme="crimson"] {
+  color: var(--ow-vellum) !important;
+  background-color: color-mix(in oklab, var(--ow-oxblood) 82%, transparent) !important;
+}
+body.oldworld .site-nav[data-theme="cream"] {
+  color: var(--ow-oxblood) !important;
+  background-color: color-mix(in oklab, var(--ow-vellum) 86%, transparent) !important;
+}
+body.oldworld .site-footer {
+  background: var(--ow-vellum);
+  color: var(--ow-oxblood);
+}
+
+/* Old World typography — illuminated-manuscript serif for display CONTENT only.
+   Per STYLING_LEARNINGS.md #13: NEVER apply theme serif to .brand,
+   .world-picker, or nav links — different font widths cause horizontal nav jerk. */
+body.oldworld .headline-hero,
+body.oldworld .bio-headline,
+body.oldworld .cap-display,
+body.oldworld .chat-pitch h2,
+body.oldworld .acc-title,
+body.oldworld .stat-value,
+body.oldworld .foot-link,
+body.oldworld .foot-socials a,
+body.oldworld .btn,
+body.oldworld .chat-send,
+body.oldworld .meme-tile .meme-tag,
+body.oldworld .tweaks-row .seg button {
+  font-family: 'Cormorant SC', 'IM Fell English SC', 'Cinzel', serif;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+/* Per-theme brand visual tweaks — ONLY non-layout-affecting properties.
+   Font-family/letter-spacing intentionally NOT overridden on .brand (#13). */
+body.oldworld   .brand-dot { transform: rotate(45deg); border-radius: 0; }
+body.grimfuture .brand-dot { transform: rotate(45deg); border-radius: 0; }
+body.oldworld .chakobsa,
+body.oldworld .section-header,
+body.oldworld .stat-label,
+body.oldworld .section-label,
+body.oldworld .scroll-cue,
+body.oldworld .foot-label,
+body.oldworld .foot-bar,
+body.oldworld .acc-num,
+body.oldworld .msg-meta,
+body.oldworld .chat-titlebar,
+body.oldworld .meme-tile .meme-caption,
+body.oldworld .chat-chip,
+body.oldworld .chat-input,
+body.oldworld .msg {
+  font-family: 'IM Fell English', 'JetBrains Mono', serif;
+  font-style: italic;
+  letter-spacing: 0.08em;
+}
+body.oldworld .bio-body,
+body.oldworld .cap-blurb,
+body.oldworld .acc-body-inner,
+body.oldworld .chat-pitch p,
+body.oldworld .subtitle {
+  font-family: 'Cormorant Garamond', 'IM Fell English', serif;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.005em;
+  font-style: italic;
+}
+/* IM Fell English SC + Cinzel render WIDER than Anton at the same px size,
+   so headlines wrap to 2 lines in OW. Shrink display sizes per-theme to keep
+   wrap-count consistent — per STYLING_LEARNINGS.md #7. */
+body.oldworld .headline-hero {
+  letter-spacing: 0; line-height: 1.0;
+  font-size: clamp(40px, 9vw, 132px);
+}
+body.oldworld .bio-headline {
+  font-size: clamp(22px, 3vw, 40px);
+  letter-spacing: 0;
+}
+body.oldworld .cap-display,
+body.oldworld .chat-pitch h2 {
+  font-size: clamp(40px, 7vw, 96px);
+  letter-spacing: 0.01em;
+}
+/* Hide spice-field in OW — sand particles don't belong in a vellum scriptorium.
+   Per STYLING_LEARNINGS.md #8: theme-specific visuals must hide outside their theme. */
+body.oldworld .spice-field i { display: none; }
+
+/* Hide the cyber crack underline — replace with hand-drawn underline via border */
+body.oldworld .headline-hero .crack::after,
+body.oldworld .glitch::before,
+body.oldworld .glitch::after { display: none; }
+body.oldworld .headline-hero .crack {
+  border-bottom: 3px solid currentColor;
+  padding-bottom: 0.04em;
+}
+body.oldworld .subtitle { text-transform: none; font-style: italic; font-weight: 400; font-size: clamp(15px, 1.7vw, 18px); }
+
+/* Buttons get a wax-seal feel — small drop, no chrome */
+body.oldworld .btn,
+body.oldworld .btn-filled { border-width: 1.5px; border-radius: 0; }
+body.oldworld .btn-filled {
+  background: var(--ow-vellum); color: var(--ow-oxblood); border-color: var(--ow-vellum);
+}
+body.oldworld .section-cream .btn-filled {
+  background: var(--ow-oxblood); color: var(--ow-vellum); border-color: var(--ow-oxblood);
+}
+
+/* Portrait gets a sepia/woodcut treatment */
+body.oldworld .portrait-wrap .cartouche-inner img {
+  filter: sepia(0.55) contrast(1.15) saturate(0.55);
+  mix-blend-mode: multiply;
+}
+body.oldworld .section-crimson .portrait-wrap .cartouche-inner img {
+  filter: sepia(0.7) contrast(1.25) saturate(0.4);
+  mix-blend-mode: screen;
+}
+body.oldworld .meme-tile img { filter: sepia(0.6) contrast(1.1) saturate(0.5); }
+body.oldworld .meme-tile.tone-ink   .cartouche-inner { background: var(--ow-iron); }
+body.oldworld .meme-tile.tone-cream .cartouche-inner { background: var(--ow-vellum); }
+body.oldworld .meme-tile .cartouche-inner             { background: var(--ow-oxblood); }
+
+body.oldworld .chat-window { background: var(--ow-vellum); color: var(--ow-oxblood); border-color: var(--ow-iron); }
+body.oldworld .section-cream .chat-window { background: var(--ow-oxblood); color: var(--ow-vellum); border-color: var(--ow-oxblood); }
+body.oldworld .chat-send { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.oldworld .section-cream .chat-send { background: var(--ow-vellum); color: var(--ow-oxblood); }
+body.oldworld .msg-user .msg-body { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.oldworld .section-cream .msg-user .msg-body { background: var(--ow-vellum); color: var(--ow-oxblood); }
+body.oldworld .acc-row:hover { background: var(--ow-vellum); color: var(--ow-oxblood); }
+body.oldworld .section-cream .acc-row:hover { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.oldworld .chat-chip:hover { background: var(--ow-vellum); color: var(--ow-oxblood); }
+body.oldworld .section-cream .chat-chip:hover { background: var(--ow-oxblood); color: var(--ow-vellum); }
+body.oldworld .parallax-word { opacity: 0.06; font-family: 'Cormorant SC', serif; font-weight: 700; letter-spacing: 0; }
+
+/* Candle-flicker glow on glitch text (no chromatic-aberration glitch, warm halo) */
+body.oldworld .glitch {
+  position: relative;
+  text-shadow: 0 0 12px rgba(255, 200, 100, 0.0);
+  animation: candle-flicker 5s ease-in-out infinite;
+}
+@keyframes candle-flicker {
+  0%, 100% { text-shadow: 0 0 8px rgba(255, 190, 100, 0.10); }
+  45%      { text-shadow: 0 0 14px rgba(255, 190, 100, 0.18); }
+  47%      { text-shadow: 0 0 4px  rgba(255, 190, 100, 0.05); }
+  50%      { text-shadow: 0 0 14px rgba(255, 190, 100, 0.18); }
+}
+
+/* ================================================================
+   GRIM FUTURE MODE — grimdark gothic sci-fi
+   Void-black sections, brass + bone type, ember-red accents.
+   ================================================================ */
+body.grimfuture {
+  --bg: var(--gf-void);
+  --fg: var(--gf-brass);
+  background: var(--gf-void);
+  color: var(--gf-brass);
+}
+body.grimfuture .page-section {
+  background: var(--gf-void) !important;
+  color: var(--gf-brass) !important;
+}
+/* Cream sections invert to bone — a band of ivory with void type */
+body.grimfuture .section-cream {
+  background: var(--gf-bone) !important;
+  color: var(--gf-void) !important;
+}
+body.grimfuture .section-crimson {
+  background:
+    radial-gradient(circle at 12% 22%, rgba(184,137,58,0.06) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 78% 64%, rgba(184,137,58,0.05) 0 1px, transparent 1.5px),
+    radial-gradient(ellipse 60% 100% at 50% 50%, rgba(168,58,20,0.06), transparent 70%),
+    /* rivet rows */
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(184,137,58,0.04) 79px 80px),
+    var(--gf-void) !important;
+  background-size: 220px 220px, 320px 320px, 100% 100%, 100% 100% !important;
+}
+body.grimfuture .section-cream {
+  background-image:
+    radial-gradient(circle at 14% 18%, rgba(22,17,13,0.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 64%, rgba(22,17,13,0.08) 0 1px, transparent 2px),
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(22,17,13,0.05) 79px 80px),
+    radial-gradient(ellipse 80% 60% at 50% 50%, transparent 50%, rgba(22,17,13,0.18) 100%);
+  background-size: 240px 240px, 320px 320px, 100% 100%, 100% 100%;
+}
+
+body.grimfuture .site-nav,
+body.grimfuture .site-nav[data-theme] {
+  color: var(--gf-brass) !important;
+  border-bottom-color: var(--gf-brass);
+  background-color: color-mix(in oklab, var(--gf-void) 86%, transparent) !important;
+}
+body.grimfuture .site-nav[data-theme="cream"] {
+  color: var(--gf-void) !important;
+  background-color: color-mix(in oklab, var(--gf-bone) 86%, transparent) !important;
+}
+body.grimfuture .site-footer { background: var(--gf-void); color: var(--gf-brass); }
+
+/* Grim Future typography — gothic engraved Cinzel caps for display CONTENT only.
+   Per STYLING_LEARNINGS.md #13: NEVER on .brand/.world-picker/nav links. */
+body.grimfuture .headline-hero,
+body.grimfuture .bio-headline,
+body.grimfuture .cap-display,
+body.grimfuture .chat-pitch h2,
+body.grimfuture .acc-title,
+body.grimfuture .stat-value,
+body.grimfuture .foot-link,
+body.grimfuture .foot-socials a,
+body.grimfuture .btn,
+body.grimfuture .chat-send,
+body.grimfuture .meme-tile .meme-tag,
+body.grimfuture .tweaks-row .seg button {
+  font-family: 'Cinzel', 'IM Fell English SC', serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+body.grimfuture .headline-hero {
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  font-size: clamp(40px, 9.5vw, 140px);
+}
+body.grimfuture .bio-headline {
+  font-size: clamp(22px, 3vw, 40px);
+  letter-spacing: 0.01em;
+}
+body.grimfuture .cap-display,
+body.grimfuture .chat-pitch h2 {
+  font-size: clamp(40px, 7vw, 96px);
+  letter-spacing: 0.02em;
+}
+body.grimfuture .chakobsa,
+body.grimfuture .section-header,
+body.grimfuture .stat-label,
+body.grimfuture .section-label,
+body.grimfuture .scroll-cue,
+body.grimfuture .foot-label,
+body.grimfuture .foot-bar,
+body.grimfuture .acc-num,
+body.grimfuture .msg-meta,
+body.grimfuture .chat-titlebar,
+body.grimfuture .meme-tile .meme-caption,
+body.grimfuture .chat-chip,
+body.grimfuture .chat-input,
+body.grimfuture .msg {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+/* Note: .nav-link intentionally NOT overridden — changing nav-link font causes
+   horizontal layout shift since nav-inner is centered between brand and picker
+   (see STYLING_LEARNINGS.md §13). */
+body.grimfuture .bio-body,
+body.grimfuture .cap-blurb,
+body.grimfuture .acc-body-inner,
+body.grimfuture .chat-pitch p,
+body.grimfuture .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+body.grimfuture .btn-filled {
+  background: var(--gf-brass); color: var(--gf-void); border-color: var(--gf-brass);
+}
+body.grimfuture .section-cream .btn-filled {
+  background: var(--gf-void); color: var(--gf-brass); border-color: var(--gf-void);
+}
+body.grimfuture .btn:hover { box-shadow: 4px 4px 0 var(--gf-ember); }
+
+body.grimfuture .meme-tile .cartouche-inner             { background: var(--gf-void); }
+body.grimfuture .meme-tile.tone-cream .cartouche-inner  { background: var(--gf-bone); }
+body.grimfuture .meme-tile.tone-ink   .cartouche-inner  { background: #0a0806; }
+body.grimfuture .meme-tile img { filter: sepia(0.3) hue-rotate(340deg) contrast(1.1) saturate(0.7) brightness(0.85); }
+body.grimfuture .portrait-wrap .cartouche-inner          { background: var(--gf-brass); }
+body.grimfuture .portrait-wrap .cartouche-inner img      { mix-blend-mode: multiply; filter: sepia(0.5) contrast(1.2) saturate(0.4); }
+body.grimfuture .section-crimson .portrait-wrap .cartouche-inner { background: var(--gf-bone); }
+
+body.grimfuture .chat-window { background: #1d1812; color: var(--gf-brass); border-color: var(--gf-brass); }
+body.grimfuture .section-cream .chat-window { background: var(--gf-bone); color: var(--gf-void); border-color: var(--gf-void); }
+body.grimfuture .chat-send { background: var(--gf-brass); color: var(--gf-void); }
+body.grimfuture .section-cream .chat-send { background: var(--gf-void); color: var(--gf-brass); }
+body.grimfuture .msg-user .msg-body { background: var(--gf-brass); color: var(--gf-void); }
+body.grimfuture .section-cream .msg-user .msg-body { background: var(--gf-void); color: var(--gf-brass); }
+body.grimfuture .acc-row:hover { background: var(--gf-brass); color: var(--gf-void); }
+body.grimfuture .section-cream .acc-row:hover { background: var(--gf-void); color: var(--gf-brass); }
+body.grimfuture .chat-chip:hover { background: var(--gf-brass); color: var(--gf-void); }
+body.grimfuture .section-cream .chat-chip:hover { background: var(--gf-void); color: var(--gf-brass); }
+body.grimfuture .parallax-word { opacity: 0.07; font-family: 'Cinzel', serif; font-weight: 900; }
+/* Spice field kept but ember-red on GF — ember particles drift instead of sand */
+body.grimfuture .spice-field i { background: var(--gf-ember); opacity: 0; box-shadow: 0 0 8px var(--gf-ember); }
+
+/* Ember-red drop-shadow glitch variant — faint iron-on-ember glow */
+body.grimfuture .glitch {
+  position: relative;
+  color: inherit;
+  filter: drop-shadow(0 0 6px rgba(168, 58, 20, 0.15));
+}
+body.grimfuture .glitch::before,
+body.grimfuture .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* data-text ("DANIEL † SIS") has spaces the glued real text lacks, so the
+     ember layer wraps "SIS" to a 2nd line at desktop width; pin it to one
+     line so it overlays the gold headline instead of overflowing below. */
+  white-space: nowrap;
+}
+body.grimfuture .glitch::before {
+  color: var(--gf-ember);
+  left: calc(1.5px * var(--glitch-amount));
+  top:  calc(1px * var(--glitch-amount));
+  opacity: 0.35;
+}
+body.grimfuture .glitch::after { display: none; }
+
+/* Faint cathedral candle haze + film grain over the void */
+body.grimfuture::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  background:
+    radial-gradient(ellipse 60% 30% at 50% 0%, rgba(184,137,58,0.06), transparent 70%),
+    radial-gradient(ellipse 50% 25% at 50% 100%, rgba(168,58,20,0.05), transparent 70%);
+  mix-blend-mode: screen;
+}
+body.grimfuture::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 201;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(184,137,58,0.018) 0 1px,
+      transparent 1px 4px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+}
+
+/* Dialogflow widget theming for OW + GF */
+body.oldworld df-messenger {
+  --df-messenger-button-titlebar-color:  var(--ow-oxblood);
+  --df-messenger-button-titlebar-font-color: var(--ow-vellum);
+  --df-messenger-chat-background-color:  var(--ow-vellum);
+  --df-messenger-font-color:             var(--ow-oxblood);
+  --df-messenger-bot-message:            var(--ow-oxblood);
+  --df-messenger-user-message:           var(--ow-oxblood);
+  --df-messenger-send-icon:              var(--ow-oxblood);
+  --df-messenger-input-box-color:        #d4ccdc;
+  --df-messenger-input-font-color:       var(--ow-oxblood);
+  --df-messenger-minimized-chat-close-icon-color: var(--ow-vellum);
+}
+body.grimfuture df-messenger {
+  --df-messenger-button-titlebar-color:  var(--gf-brass);
+  --df-messenger-button-titlebar-font-color: var(--gf-void);
+  --df-messenger-chat-background-color:  #1d1812;
+  --df-messenger-font-color:             var(--gf-brass);
+  --df-messenger-bot-message:            #2a2010;
+  --df-messenger-user-message:           #2a2010;
+  --df-messenger-send-icon:              var(--gf-brass);
+  --df-messenger-input-box-color:        #24200e;
+  --df-messenger-input-font-color:       var(--gf-brass);
+  --df-messenger-minimized-chat-close-icon-color: var(--gf-void);
 }
 
 @media (prefers-reduced-motion: reduce) {
