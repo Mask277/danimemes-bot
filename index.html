@@ -1,153 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DANIMEMES — Dan-bot</title>
 
-  <head>
-    <!-- Loading Items -->
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="styles.css">
-      <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-      <title>Danimemes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@500;700;800&family=Mochiy+Pop+One&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 
-    <!-- df-messenger chat widget -->
-      <df-messenger
-        intent="WELCOME"
-        chat-title="BlueSmart"
-        chat-icon="https://cdn.discordapp.com/attachments/821479626995662900/1012586456700690482/unknown.png"
-        agent-id="faea3bb6-8fff-429c-bed0-8013a4b52021"
-        language-code="en"
-        expand="true">
-      </df-messenger>
+  <!-- Dialogflow Messenger bootstrap -->
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+</head>
 
-      <style>
-      /* df-messenger vars — crimson/cream two-tone system. */
-      df-messenger {
-        --df-messenger-bot-message: #eb1a4a;
-        --df-messenger-button-titlebar-color: #e40038;
-        --df-messenger-chat-background-color: #faf3e9;
-        --df-messenger-font-color: #faf3e9;
-        --df-messenger-send-icon: #e40038;
-        --df-messenger-user-message: #e40038;
-      }
-      </style>
+<body class="arrakis">
 
-    <!-- Audio -->
-    <audio id="fade">
-      <!-- <source src="audio/Cyberpunk 2077 — Never Fade Away by SAMURAI (Refused).mp3" type="audio/mpeg"> -->
-    </audio>
-  </head>
+  <!-- ============================================================
+       STICKY NAV
+       ============================================================ -->
+  <nav id="siteNav" class="site-nav" data-theme="crimson" aria-label="Site navigation">
+    <a class="brand" href="#hero">
+      <span class="brand-dot" aria-hidden="true"></span>
+      DANIMEMES
+    </a>
 
-  <!-- dModeBody: 'arrakis' (default) | 'night-city' (Night City glitch mode) -->
-  <body id="dModeBody" class="arrakis">
+    <div class="nav-inner">
+      <a href="#about" class="nav-link"><span class="nav-link-num">01</span>ABOUT</a>
+      <a href="#capabilities" class="nav-link"><span class="nav-link-num">02</span>SKILLS</a>
+      <a href="#memes" class="nav-link"><span class="nav-link-num">03</span>MEMES</a>
+      <a href="#chat" class="nav-link"><span class="nav-link-num">04</span>CHAT</a>
+    </div>
 
-    <!-- ============================================================
-         STICKY NAV
-         data-theme="crimson" = shown over a crimson bg section
-                                → cream text + cream hairline
-         data-theme="cream"   = shown over a cream bg section
-                                → crimson text + crimson hairline
-         ============================================================ -->
-    <nav id="siteNav" class="site-nav" data-theme="crimson" aria-label="Site navigation">
-      <div class="nav-inner">
-        <a href="#section-hero"  class="nav-link">HOME</a>
-        <a href="#section-about" class="nav-link">ABOUT</a>
-        <a href="#section-chat"  class="nav-link">CHAT</a>
+    <button id="ncToggle" class="btn-nc-toggle" type="button">ENTER NIGHT CITY</button>
+  </nav>
+
+  <!-- ============================================================
+       01 — HERO (spice)
+       ============================================================ -->
+  <section id="hero" class="page-section section-crimson" data-section-theme="crimson" data-screen-label="01 Hero">
+    <div class="parallax-word" data-parallax-speed="0.32" aria-hidden="true" data-arr="MUAD’DAN" data-nc="SAMURAI">MUAD&rsquo;DAN</div>
+
+    <!-- Drifting spice particles -->
+    <div class="spice-field" aria-hidden="true">
+      <i style="left: 8%;  bottom: 12%; animation-duration: 9s;  animation-delay: 0s;"></i>
+      <i style="left: 18%; bottom: 28%; animation-duration: 11s; animation-delay: 1.2s;"></i>
+      <i style="left: 27%; bottom: 8%;  animation-duration: 13s; animation-delay: 2.4s;"></i>
+      <i style="left: 35%; bottom: 36%; animation-duration: 10s; animation-delay: 0.8s;"></i>
+      <i style="left: 48%; bottom: 18%; animation-duration: 12s; animation-delay: 3s;"></i>
+      <i style="left: 58%; bottom: 42%; animation-duration: 14s; animation-delay: 1.6s;"></i>
+      <i style="left: 68%; bottom: 22%; animation-duration: 9s;  animation-delay: 2.2s;"></i>
+      <i style="left: 76%; bottom: 8%;  animation-duration: 11s; animation-delay: 0.4s;"></i>
+      <i style="left: 84%; bottom: 30%; animation-duration: 13s; animation-delay: 3.4s;"></i>
+      <i style="left: 92%; bottom: 16%; animation-duration: 10s; animation-delay: 1s;"></i>
+    </div>
+
+    <div class="section-inner hero-inner">
+      <div class="section-header">
+        <span class="counter dot-marker">01 / 05</span>
+        <span class="meta">
+          <span data-arr="SIETCH-BUILD" data-nc="BLACKWALL BUILD">SIETCH-BUILD</span>
+          <span data-arr="YEAR 10,191" data-nc="Y. 2077">YEAR 10,191</span>
+        </span>
       </div>
-      <!-- Night-City toggle lives in the nav so it's always reachable -->
-      <div class="nav-toggle-wrap">
-        <button id="lightSwitch" class="btnJp" onclick="DarkMode()" type="button">
-          ENTER NIGHT CITY
-        </button>
+
+      <span id="heroKicker" class="chakobsa"
+            data-arr="LISAN AL-DAN — THE VOICE FROM THE LIVING ROOM"
+            data-nc="NETRUNNER ONLINE — JACK IN, CHOOMBA">LISAN AL-DAN &mdash; THE VOICE FROM THE LIVING ROOM</span>
+
+      <h1 id="heroHeadline" class="headline-hero glitch" data-text="DANIEL, BOT"
+          data-arr-html='DANIEL,<span class="crack">BOT</span>' data-arr-text="DANIEL, BOT"
+          data-nc-html='DANIEL.<span class="crack">EXE</span>'  data-nc-text="DANIEL.EXE">DANIEL,<span class="crack">BOT</span></h1>
+
+      <p id="heroSub" class="subtitle"
+         data-arr="A BIRTHDAY ORACLE FROM THE DEEP DESERT. ASK HIM ABOUT KEYBOARDS, KETO, OR THE TIME HE TRIED TO BAKE BREAD AND PRODUCED A BRICK."
+         data-nc="A BIRTHDAY NETRUNNER WIRED INTO YOUR BROWSER. ASK HIM ABOUT KEYBOARDS, ICE, OR WHY HE WON’T SHUT UP ABOUT BEATING ME AT SMASH.">A BIRTHDAY ORACLE FROM THE DEEP DESERT. ASK HIM ABOUT KEYBOARDS, KETO, OR THE TIME HE TRIED TO BAKE BREAD AND PRODUCED A BRICK.</p>
+
+      <div class="hero-cta-row">
+        <a href="#chat" class="btn btn-filled">
+          <span class="lbl" data-arr="SUMMON THE BOT" data-nc="JACK IN">SUMMON THE BOT</span>
+          <span class="btn-arrow"></span>
+        </a>
+        <a href="#about" class="btn" data-arr="READ THE DOSSIER" data-nc="READ THE SPECSHEET">READ THE DOSSIER</a>
+        <svg class="worm-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46"/>
+          <circle cx="50" cy="50" r="34"/>
+          <circle cx="50" cy="50" r="22"/>
+          <circle cx="50" cy="50" r="10"/>
+          <g class="dots">
+            <circle cx="50" cy="4"  r="1.4"/>
+            <circle cx="96" cy="50" r="1.4"/>
+            <circle cx="50" cy="96" r="1.4"/>
+            <circle cx="4"  cy="50" r="1.4"/>
+          </g>
+        </svg>
       </div>
-    </nav>
+    </div>
 
-    <!-- ============================================================
-         SECTION 1 — HERO
-         bg: crimson  |  text: cream
-         ============================================================ -->
-    <section id="section-hero" class="page-section section-crimson" data-section-theme="crimson">
-      <!-- Parallax display word — sits behind content, scrolls slow -->
-      <div class="parallax-word" data-parallax-speed="0.35" aria-hidden="true">DANIEL</div>
+    <div class="scroll-cue" aria-hidden="true">
+      <span data-arr="BI-LA KAIFA — SCROLL" data-nc="WAKE UP — SCROLL">BI-LA KAIFA &mdash; SCROLL</span>
+      <span class="bar"></span>
+    </div>
+  </section>
 
-      <div class="section-inner hero-inner">
-        <!-- Modular counter -->
-        <span class="section-counter">01 / 03</span>
+  <!-- ============================================================
+       02 — ABOUT (cream)
+       ============================================================ -->
+  <section id="about" class="page-section section-cream" data-section-theme="cream" data-screen-label="02 About">
+    <div class="parallax-word" data-parallax-speed="0.4" aria-hidden="true" data-arr="FREMEN" data-nc="NETRUNNER">FREMEN</div>
 
-        <!-- Japanese kicker rendered explicitly so Night City can swap it -->
-        <p class="jp-kicker" id="jpKicker">ようこそ　ダンニエルのボットへ</p>
-
-        <!-- Giant Anton headline — data-text kept for Night City glitch pseudo layers -->
-        <h1 id="descText1" class="headline-hero glitch-text" data-text="ようこそ　ダンニエルのボットへ">
-          WELCOME TO THE DANIEL BOT.
-        </h1>
-
-        <!-- Subtitle -->
-        <p id="descText2" class="subtitle glitch-text" data-text="Save us Daniel">
-          YOU CAN INTERACT WITH ME USING THE CHATBOX IN THE BOTTOM RIGHT.
-        </p>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="counter">02 / 05</span>
+        <span class="meta">
+          <span>[ FILE_01 ]</span>
+          <span data-arr="DOSSIER.TXT" data-nc="BIODECK.BIN">DOSSIER.TXT</span>
+        </span>
       </div>
-    </section>
 
-    <!-- ============================================================
-         SECTION 2 — PORTRAIT / ABOUT
-         bg: cream  |  text: crimson
-         ============================================================ -->
-    <section id="section-about" class="page-section section-cream" data-section-theme="cream">
-      <!-- Parallax display word -->
-      <div class="parallax-word" data-parallax-speed="0.40" aria-hidden="true">CHAT</div>
+      <p class="section-label" data-arr="— THE SUBJECT · FILED UNDER ‘USUL’" data-nc="— THE SUBJECT · FILED UNDER ‘CHOOMBA’">&mdash; THE SUBJECT &middot; FILED UNDER &lsquo;USUL&rsquo;</p>
 
-      <div class="section-inner about-inner">
-        <span class="section-counter">02 / 03</span>
-        <p class="section-label">THE DANIEL BOT</p>
+      <div class="about-grid">
+        <div class="portrait-wrap">
+          <div class="cartouche">
+            <div class="cartouche-inner">
+              <img src="image/DanGlas.png" alt="Daniel, doubled, wearing sunglasses" />
+            </div>
+          </div>
+        </div>
 
-        <!-- Dan portrait with flat 1px crimson hairline frame — btn wrapper preserved -->
-        <button class="btn portrait-btn" aria-label="Daniel photos">
-          <!-- dan1: fullDan / Cypher.png — hidden in Arrakis, shown in Night City -->
-          <img src="image/Cypher.png" class="fullDan danPicTog" id="dan1" alt="Picture of Daniel">
-          <!-- dan2: smile / DanGlas.png — default visible portrait -->
-          <img src="image/DanGlas.png" class="smile portrait-img" id="dan2" alt="Picture of Daniel">
-          <!-- Background video — hidden in Arrakis, revealed in Night City -->
-          <video autoplay muted loop id="cBg" class="video cBgHide">
-            <source src="image/AcidicInfamousDipper.mp4" type="video/mp4">
-          </video>
-        </button>
+        <div class="bio">
+          <h2 class="bio-headline"
+              data-arr="DANIEL IS A RESPIRATORY THERAPIST, A CERTIFIED COFFEE DEPENDENT, AND THE ONLY MAN IN THE THREE WORLDS WHO WILL ARGUE ABOUT KEYBOARDS FOR NINETY MINUTES."
+              data-nc="DANIEL IS A RESPIRATORY THERAPIST, A CERTIFIED COFFEE DEPENDENT, AND THE ONLY CHOOMBA IN NIGHT CITY WHO WILL ARGUE ABOUT KEYBOARDS FOR NINETY MINUTES STRAIGHT.">DANIEL IS A RESPIRATORY THERAPIST, A CERTIFIED COFFEE DEPENDENT, AND THE ONLY MAN IN THE THREE WORLDS WHO WILL ARGUE ABOUT KEYBOARDS FOR NINETY MINUTES.</h2>
+          <p class="bio-body"
+             data-arr="This site is a birthday-shaped excuse to play with Google’s chatbot stack and to embarrass a friend, in roughly that order. The bot ships in two flavors: an Arrakis build (sand and spice, polite, slightly melancholy, distantly prophetic) and a Night City build (yellow on black, hostile-friendly, more glitch). The spice must flow. The roast must flow."
+             data-nc="This site is a birthday-shaped excuse to play with Google’s chatbot stack and to embarrass a friend, in roughly that order. The bot ships in two flavors: an Arrakis build (sand and spice, polite, slightly melancholy, distantly prophetic) and a Night City build (yellow on black, hostile-friendly, more glitch). Wake the fuck up, samurai. We have someone to roast.">This site is a birthday-shaped excuse to play with Google&rsquo;s chatbot stack and to embarrass a friend, in roughly that order. The bot ships in two flavors: an Arrakis build (sand and spice, polite, slightly melancholy, distantly prophetic) and a Night City build (yellow on black, hostile-friendly, more glitch). The spice must flow. The roast must flow.</p>
 
-        <p class="about-blurb">
-          AN AI-POWERED BOT BUILT ON GOOGLE DIALOGFLOW. ASK IT ANYTHING.
-        </p>
+          <div class="stat-grid">
+            <div class="stat">
+              <span class="stat-label" data-arr="HOUSE" data-nc="CORP">HOUSE</span>
+              <span class="stat-value" data-arr="ATREIDAN" data-nc="ARASAKA REJECT">ATREIDAN</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label" data-arr="SIETCH" data-nc="DISTRICT">SIETCH</span>
+              <span class="stat-value" data-arr="TORONTO, ON" data-nc="WATSON / KABUKI">TORONTO, ON</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label" data-arr="DISCIPLINE" data-nc="STREETCRED">DISCIPLINE</span>
+              <span class="stat-value">DEBUGGING @ 2 AM</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label" data-arr="STILLSUIT KIT" data-nc="LOADOUT">STILLSUIT KIT</span>
+              <span class="stat-value" data-arr="HHKB / ALICE" data-nc="HHKB / SANDY-V.">HHKB / ALICE</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label" data-arr="WATER LEVEL" data-nc="CHROME LEVEL">WATER LEVEL</span>
+              <span class="stat-value">COFFEE × N</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label" data-arr="WEAKNESS" data-nc="BUG">WEAKNESS</span>
+              <span class="stat-value">PASTA, WEATHER</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============================================================
-         SECTION 3 — CHAT CTA / FOOTER
-         bg: crimson  |  text: cream
-         ============================================================ -->
-    <section id="section-chat" class="page-section section-crimson" data-section-theme="crimson">
-      <!-- Parallax display word -->
-      <div class="parallax-word" data-parallax-speed="0.30" aria-hidden="true">ASK</div>
+  <!-- ============================================================
+       03 — SKILLS / ACCORDION (crimson)
+       ============================================================ -->
+  <section id="capabilities" class="page-section section-crimson" data-section-theme="crimson" data-screen-label="03 Skills">
+    <div class="parallax-word" data-parallax-speed="0.3" aria-hidden="true" data-arr="PROPHECY" data-nc="NEUROLINK">PROPHECY</div>
 
-      <div class="section-inner chat-inner">
-        <span class="section-counter">03 / 03</span>
-
-        <p class="chat-cta-label">START A CONVERSATION</p>
-        <p class="chat-cta-body">
-          OPEN THE CHAT WIDGET IN THE BOTTOM RIGHT TO TALK WITH THE DANIEL BOT.
-        </p>
-
-        <!-- Hairline rule separator -->
-        <hr class="hairline" aria-hidden="true">
-
-        <footer id="descText3" class="site-footer glitch-text" data-text="Chatbot built using Google's Dialogflow.">
-          CHATBOT BUILT USING GOOGLE'S DIALOGFLOW.
-        </footer>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="counter">03 / 05</span>
+        <span class="meta">
+          <span>[ FILE_02 ]</span>
+          <span data-arr="CAPABILITIES.YAML" data-nc="CAPS.CHIP">CAPABILITIES.YAML</span>
+        </span>
       </div>
-    </section>
 
-    <!-- Main JS — loaded last so DOM is ready -->
-    <script src="index.js"></script>
-  </body>
+      <div class="cap-intro">
+        <h2 class="cap-display glitch" data-text="ASK ME ANYTHING">ASK ME<br />ANYTHING</h2>
+        <p class="cap-blurb"
+           data-arr="Five things Dan-bot actually has opinions on. Pick a row to unfold; he’ll happily talk past you about any of these for as long as your water rations allow."
+           data-nc="Five things Dan-bot actually has opinions on. Pick a row to unfold; he’ll happily talk past you about any of these until your eddies run out.">Five things Dan-bot actually has opinions on. Pick a row to unfold; he&rsquo;ll happily talk past you about any of these for as long as your water rations allow.</p>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-row" data-id="01">
+          <div class="acc-head">
+            <span class="acc-num">/01</span>
+            <span class="acc-title">MECHANICAL KEYBOARDS</span>
+            <span class="acc-plus" aria-hidden="true"></span>
+          </div>
+          <div class="acc-body">
+            <div>
+              <div class="spacer"></div>
+              <div class="acc-body-inner">Topre vs. MX vs. Choc. Lubed linears vs. tactiles you can actually feel. Whether the Alice layout is a gateway drug or a destination. Dan-bot has Strong Opinions™ and will deliver them at length.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-row" data-id="02">
+          <div class="acc-head">
+            <span class="acc-num">/02</span>
+            <span class="acc-title">ARRAKIS vs NIGHT CITY</span>
+            <span class="acc-plus" aria-hidden="true"></span>
+          </div>
+          <div class="acc-body">
+            <div>
+              <div class="spacer"></div>
+              <div class="acc-body-inner">One is a slow desert opera about water, prophecy, and a worm the size of a freight train. The other is a chrome-and-neon mess where everyone you love gets a cybernetic arm. Both are correct. The toggle at the top of this page picks a side.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-row" data-id="03">
+          <div class="acc-head">
+            <span class="acc-num">/03</span>
+            <span class="acc-title">DEBUGGING AT 2 AM</span>
+            <span class="acc-plus" aria-hidden="true"></span>
+          </div>
+          <div class="acc-body">
+            <div>
+              <div class="spacer"></div>
+              <div class="acc-body-inner">Console-log archaeology. The exact moment to give up and go to bed (you should have gone to bed an hour ago). Why your CSS specificity bug is actually a misplaced semicolon two files over.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-row" data-id="04">
+          <div class="acc-head">
+            <span class="acc-num">/04</span>
+            <span class="acc-title">UNREASONABLE COFFEE OPINIONS</span>
+            <span class="acc-plus" aria-hidden="true"></span>
+          </div>
+          <div class="acc-body">
+            <div>
+              <div class="spacer"></div>
+              <div class="acc-body-inner">V60 vs. Aeropress vs. just-buy-the-espresso-machine-already. Why a flat white is not a small latte. Why the third coffee of the day is, statistically, the most productive one.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-row" data-id="05">
+          <div class="acc-head">
+            <span class="acc-num">/05</span>
+            <span class="acc-title">WEIRDLY SPECIFIC BIRTHDAY NOSTALGIA</span>
+            <span class="acc-plus" aria-hidden="true"></span>
+          </div>
+          <div class="acc-body">
+            <div>
+              <div class="spacer"></div>
+              <div class="acc-body-inner">Stories the bot will tell if asked nicely: the time we got lost in Kyoto, the time Dan tried to bake bread and produced a brick, the time he beat me at Smash and would not shut up about it for a week.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       04 — MEME GALLERY (cream)
+       ============================================================ -->
+  <section id="memes" class="page-section section-cream" data-section-theme="cream" data-screen-label="04 Memes">
+    <div class="parallax-word" data-parallax-speed="0.42" aria-hidden="true" data-arr="SIETCH" data-nc="ARCADE">SIETCH</div>
+
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="counter">04 / 05</span>
+        <span class="meta">
+          <span>[ FILE_03 ]</span>
+          <span data-arr="EXHIBIT.GALLERY" data-nc="EXHIBIT.NET-77">EXHIBIT.GALLERY</span>
+        </span>
+      </div>
+
+      <p class="section-label"
+         data-arr="— THE EVIDENCE · RECOVERED FROM THE SIETCH ARCHIVE"
+         data-nc="— THE EVIDENCE · PULLED FROM THE NET">&mdash; THE EVIDENCE &middot; RECOVERED FROM THE SIETCH ARCHIVE</p>
+
+      <div class="meme-grid">
+        <div class="meme-tile">
+          <div class="cartouche">
+            <div class="cartouche-inner">
+              <span class="meme-tag">001</span>
+              <img src="image/DanGlas.png" alt="Dan, doubled, wearing sunglasses" style="object-position: 50% 35%;" />
+              <span class="meme-caption" data-arr="SUBJECT IN HIS NATURAL HABITAT — TWO OF HIM, ONE LANYARD." data-nc="SUBJECT × 2, LANYARD × 1. CALL IT A NET-DUPE.">SUBJECT IN HIS NATURAL HABITAT — TWO OF HIM, ONE LANYARD.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meme-tile tone-ink">
+          <div class="cartouche">
+            <div class="cartouche-inner">
+              <span class="meme-tag">002</span>
+              <img src="image/Cypher.png" alt="Daniel composite, Night City variant" style="object-position: 50% 18%;" />
+              <span class="meme-caption" data-arr="NETRUNNER BUILD — A.K.A. WHAT HE WISHES HE LOOKED LIKE." data-nc="NETRUNNER BUILD — ACTUAL VERIFIED FORM.">NETRUNNER BUILD — A.K.A. WHAT HE THINKS HE LOOKS LIKE.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meme-tile tone-cream">
+          <div class="cartouche">
+            <div class="cartouche-inner">
+              <span class="meme-tag">003</span>
+              <img src="image/FixedDan.png" alt="Daniel, full pose" style="object-position: 50% 12%; filter: contrast(1.05);" />
+              <span class="meme-caption">CONFIDENCE LEVEL: UNDESERVED. AGAIN.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meme-tile">
+          <div class="cartouche">
+            <div class="cartouche-inner">
+              <span class="meme-tag">004</span>
+              <img src="image/Cyber.gif" alt="Glitch loop" style="object-position: center;" />
+              <span class="meme-caption" data-arr="SECRET FRAME — DO NOT SCREENSHOT. (HE WILL SCREENSHOT IT.)" data-nc="GLITCH FRAME — CORRUPTED. DO NOT DECRYPT.">SECRET FRAME — DO NOT SCREENSHOT. (HE WILL SCREENSHOT IT.)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       05 — CHAT (crimson)
+       ============================================================ -->
+  <section id="chat" class="page-section section-crimson chat-section" data-section-theme="crimson" data-screen-label="05 Chat">
+    <div class="parallax-word" data-parallax-speed="0.36" aria-hidden="true" data-arr="WITNESS" data-nc="JACK IN">WITNESS</div>
+
+    <div class="section-inner">
+      <div class="section-header" style="grid-column: 1 / -1;">
+        <span class="counter">05 / 05</span>
+        <span class="meta">
+          <span>[ FILE_04 ]</span>
+          <span data-arr="CHAT.SOCKET" data-nc="BRAINDANCE.LINK">CHAT.SOCKET</span>
+        </span>
+      </div>
+
+      <div class="chat-pitch">
+        <h2 class="glitch" data-text="TALK TO DAN-BOT">TALK TO<br />DAN-BOT.</h2>
+        <p data-arr="Powered by Google Dialogflow ES. Type a message below or pick a chip — replies come right back here."
+           data-nc="Powered by Google Dialogflow ES. Type a message below or pick a chip — replies jack straight into this window.">Powered by Google Dialogflow ES. Type a message below or pick a chip &mdash; replies come right back here.</p>
+        <p data-arr="Suggested openers — bi-la kaifa, just type:" data-nc="Suggested openers — wake up, samurai:">Suggested openers &mdash; bi-la kaifa, just type:</p>
+        <div class="chat-suggestions">
+          <button class="chat-chip" data-q="Tell me a Dan story.">Tell me a Dan story</button>
+          <button class="chat-chip" data-q="Defend the HHKB layout.">Defend the HHKB</button>
+          <button class="chat-chip" data-q="Arrakis or Night City?">Arrakis or Night City?</button>
+          <button class="chat-chip" data-q="Roast me, gently.">Roast me, gently</button>
+          <button class="chat-chip" data-arr="Litany against fear" data-nc="Wake up, samurai" data-q="Recite a fear litany for me.">Litany against fear</button>
+        </div>
+      </div>
+
+      <div class="chat-window" aria-label="Chat with Dan-bot">
+        <div class="chat-titlebar">
+          <div class="chat-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="chat-name" data-arr="DAN-BOT // ORACLE.v2.6.1" data-nc="DAN-BOT // NETRUNNER.v2.6.1">DAN-BOT // ORACLE.v2.6.1</div>
+          <div class="chat-status"><span class="dot"></span><span data-arr="ONLINE" data-nc="JACKED IN">ONLINE</span></div>
+        </div>
+        <div id="chatLog" class="chat-log" role="log" aria-live="polite"></div>
+        <form class="chat-input-row" onsubmit="event.preventDefault();">
+          <input id="chatInput" class="chat-input" type="text" autocomplete="off"
+                 placeholder="TYPE A MESSAGE — TRY 'ROAST ME'"
+                 data-arr-placeholder="TYPE A MESSAGE — TRY 'ROAST ME'"
+                 data-nc-placeholder="TYPE A MESSAGE — TRY 'ICE ME'" />
+          <button id="chatSend" class="chat-send" type="submit" data-arr="SEND" data-nc="PING">SEND</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="site-footer" data-screen-label="06 Footer">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-label" data-arr="— A BIRTHDAY GIFT" data-nc="— A BIRTHDAY DROP">— A BIRTHDAY GIFT</div>
+        <a class="foot-link" href="#hero">DANIMEMES.LOCAL</a>
+        <div style="margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; opacity: 0.7; text-transform: uppercase;">
+          MADE WITH GOOGLE DIALOGFLOW ES, HTML, CSS,<br />
+          AN UNREASONABLE AMOUNT OF JS, AND ZERO REGRETS.
+        </div>
+      </div>
+      <div>
+        <div class="foot-label">— MORE FROM THE BUILD</div>
+        <div class="foot-socials">
+          <a href="#about"><span class="arr">↗</span>SOURCE</a>
+          <a href="#capabilities"><span class="arr">↗</span>CHANGELOG</a>
+          <a href="#memes"><span class="arr">↗</span>GALLERY</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-bar">
+      <span>DANIMEMES © BIRTHDAY EDITION</span>
+      <span data-arr="THE ROAST MUST FLOW." data-nc="WAKE UP, CHOOMBA.">THE ROAST MUST FLOW.</span>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       TWEAKS PANEL
+       ============================================================ -->
+  <aside id="tweaks" class="tweaks-panel" aria-label="Tweaks">
+    <div class="tweaks-head">
+      <span>TWEAKS</span>
+      <span class="x" role="button" aria-label="Close">×</span>
+    </div>
+    <div class="tweaks-body">
+      <div class="tweaks-row">
+        <label>WORLD</label>
+        <div class="seg" data-seg="theme">
+          <button data-val="arrakis">ARRAKIS</button>
+          <button data-val="night-city">NIGHT CITY</button>
+        </div>
+      </div>
+
+      <div class="tweaks-row">
+        <label>PALETTE (ARRAKIS)</label>
+        <div class="swatches">
+          <div class="swatch" data-accent="crimson" style="background:#c8541a" title="Spice"></div>
+          <div class="swatch" data-accent="classic" style="background:#e40038" title="Original Crimson"></div>
+          <div class="swatch" data-accent="ink"     style="background:#1c130a" title="Sietch Ink"></div>
+          <div class="swatch" data-accent="navy"    style="background:#1f4e7a" title="Fremen Blue"></div>
+          <div class="swatch" data-accent="olive"   style="background:#3a4a1e" title="Olive"></div>
+        </div>
+      </div>
+
+      <div class="tweaks-row">
+        <label>DENSITY</label>
+        <div class="seg" data-seg="density">
+          <button data-val="compact">TIGHT</button>
+          <button data-val="comfortable">COMFY</button>
+          <button data-val="spacious">LOOSE</button>
+        </div>
+      </div>
+
+      <div class="tweaks-row">
+        <label>GLITCH INTENSITY (NIGHT CITY)</label>
+        <input id="glitchSlider" type="range" min="0" max="3" step="0.1" value="1" />
+      </div>
+    </div>
+  </aside>
+
+  <!-- Persisted defaults the host can rewrite -->
+  <script>
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "arrakis",
+      "accent": "crimson",
+      "density": "comfortable",
+      "glitch": 1
+    }/*EDITMODE-END*/;
+  </script>
+
+  <!-- Dialogflow Messenger widget — hidden; conversation is mirrored into #chatLog -->
+  <!--
+    df-messenger is intentionally invisible. Its chat UI (FAB + panel) renders
+    as position:fixed inside its own shadow DOM, so off-screen positioning on
+    the host element alone does NOT hide it. The actual hide is done by
+    index.js → hideDfMessengerChrome(), which injects visibility:hidden CSS
+    directly into every shadow root the widget creates. The host-level styles
+    here are a secondary safety net only.
+  -->
+  <df-messenger
+    intent="WELCOME"
+    chat-title="BlueSmart"
+    chat-icon="https://cdn.discordapp.com/attachments/821479626995662900/1012586456700690482/unknown.png"
+    agent-id="faea3bb6-8fff-429c-bed0-8013a4b52021"
+    language-code="en"
+    style="position:fixed;width:0;height:0;bottom:0;right:0;overflow:hidden;opacity:0;pointer-events:none;clip:rect(0,0,0,0);clip-path:inset(100%);">
+  </df-messenger>
+
+  <script src="index.js"></script>
+</body>
 </html>

@@ -1,743 +1,1155 @@
 /* ================================================================
-   DANIMEMES — Arrakis + Night City themes
-   Two-color system: crimson #e40038 / cream #faf3e9
-   Fonts: Anton (display), Inter 800 (UI/body), Mochiy Pop One (JP)
-   Hard 0px corners. Flat hairlines. UPPERCASE. Negative letter-spacing.
+   DANIMEMES — Arrakis × Night City
+   crimson #e40038 / cream #faf3e9 / NC yellow #FFEB0B / NC cyan #00E6F6
    ================================================================ */
 
-/* ----------------------------------------------------------------
-   RESET & BASE
-   ---------------------------------------------------------------- */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  /* Arrakis — Dune-coded default
+     "crimson" / "cream" kept as variable names for compatibility,
+     but values now read as spice / sand. */
+  --crimson: #c8541a;        /* spice melange — burnt orange */
+  --cream:   #ede0bc;        /* desert sand */
+  --sietch:  #1c130a;        /* deep umber, cave shadow */
+  --fremen:  #1f4e7a;        /* blue-within-blue, Fremen eye */
+  --ink:     #1a0e0e;
+  --nc-yellow: #FFEB0B;
+  --nc-cyan:   #00E6F6;
+  --nc-pink:   #e0287d;
+  --nc-bg:     #0a0a0a;
+
+  --bg:   var(--cream);
+  --fg:   var(--crimson);
+  --hair: 1px;
+  --section-pad-y: clamp(80px, 11vw, 160px);
+  --section-pad-x: clamp(20px, 5vw, 56px);
+  --content-max: 1080px;
+
+  --glitch-amount: 1;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+* , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  background: #faf3e9;
-  color: #e40038;
-  font-family: 'Inter', sans-serif;
+html { scroll-behavior: smooth; }
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 800;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle dune-ripple paper grain — applied to sand sections.
+   Soft warm noise + faint horizontal wave so cream feels like sand. */
+body.arrakis .section-cream {
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(28,19,10,0.06) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 78% 64%, rgba(28,19,10,0.05) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 41% 88%, rgba(28,19,10,0.04) 0 1px, transparent 1.5px),
+    repeating-linear-gradient(
+      6deg,
+      rgba(28,19,10,0.03) 0 1px,
+      transparent 1px 80px
+    );
+  background-size: 220px 220px, 320px 320px, 180px 180px, 100% 100%;
+}
+
+body.arrakis .section-crimson {
+  background-color: var(--crimson);
+  background-image:
+    radial-gradient(circle at 18% 30%, rgba(28,19,10,0.10) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 72% 70%, rgba(28,19,10,0.08) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 50% 12%, rgba(255,240,200,0.08) 0 1px, transparent 1.5px),
+    repeating-linear-gradient(
+      -4deg,
+      rgba(28,19,10,0.04) 0 1px,
+      transparent 1px 90px
+    );
+  background-size: 240px 240px, 300px 300px, 200px 200px, 100% 100%;
+}
+
+img { display: block; max-width: 100%; }
+
+/* ================================================================
+   DUNE ORNAMENTS — sandworm rings, spice particles, dune horizon
+   ================================================================ */
+
+/* Sandworm ring: concentric dotted rings, used as section ornament */
+.worm-ring {
+  width: 84px; height: 84px;
+  display: block;
+  flex-shrink: 0;
+  color: currentColor;
+  opacity: 0.85;
+}
+.worm-ring circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.worm-ring .dots circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Chakobsa-flavored kicker — small caps, wide tracking, with bracket marks */
+.chakobsa {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1.1vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+.chakobsa::before, .chakobsa::after {
+  content: "";
+  width: 36px; height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+/* Spice particle field — small dots drifting in the hero */
+.spice-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.spice-field i {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: currentColor;
+  opacity: 0;
+  border-radius: 50%;
+  animation: spice-drift linear infinite;
+}
+@keyframes spice-drift {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.4; }
+  100% { transform: translate3d(40px, -120px, 0); opacity: 0; }
+}
+
+/* Dune-horizon hairline divider — full-bleed band with curve */
+.dune-divider {
+  position: relative;
+  height: 56px;
+  width: 100%;
+  overflow: hidden;
+  color: currentColor;
+}
+.dune-divider svg { display: block; width: 100%; height: 100%; }
+.dune-divider path { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.dune-divider .below { stroke-opacity: 0.35; }
+
+/* Imperial / Bene Gesserit-ish marker dots beside section counters */
+.section-header .dot-marker {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.section-header .dot-marker::before {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: currentColor;
+  transform: rotate(45deg);
 }
 
 /* ================================================================
-   STICKY NAV
+   NAV
    ================================================================ */
 .site-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 82px;
+  position: fixed; top: 0; left: 0; width: 100%;
+  height: 78px;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  /* transparent bg — visually picks up the section color behind it */
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--section-pad-x);
   background: transparent;
-  /* color-flip is handled by data-theme attr below */
-  transition: transform 0.25s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
-  /* bottom hairline — color matches text (swapped per theme) */
-  border-bottom: 1px solid currentColor;
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  backdrop-filter: blur(10px) saturate(1.05);
+  border-bottom: var(--hair) solid currentColor;
+  transition: transform .25s ease-out, background-color .15s ease-out, color .15s ease-out, border-color .15s ease-out;
   will-change: transform;
 }
+.site-nav.nav-hidden { transform: translateY(-100%); }
+.site-nav[data-theme="crimson"] { color: var(--cream); background-color: color-mix(in oklab, var(--crimson) 78%, transparent); }
+.site-nav[data-theme="cream"]   { color: var(--crimson); background-color: color-mix(in oklab, var(--cream) 82%, transparent); }
 
-/* Nav hidden: slide off-screen upward */
-.site-nav.nav-hidden {
-  transform: translateY(-100%);
-}
-
-/* Color variants driven by IntersectionObserver via JS */
-.site-nav[data-theme="crimson"] {
-  color: #faf3e9;  /* cream text over crimson section */
-}
-.site-nav[data-theme="cream"] {
-  color: #e40038;  /* crimson text over cream section */
-}
-
-.nav-inner {
-  display: flex;
-  align-items: center;
-  gap: 40px;
-}
-
-.nav-link {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 14px;
+.brand {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  text-decoration: none;
-  color: inherit;
-  padding: 4px 0;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.08s ease;
+  display: flex; align-items: center; gap: 10px;
+  color: inherit; text-decoration: none;
 }
+.brand-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: brand-pulse 1.8s steps(2) infinite;
+}
+@keyframes brand-pulse { 50% { opacity: 0.35; } }
 
-.nav-link:hover {
-  border-bottom-color: currentColor;
+.nav-inner { display: flex; align-items: center; gap: 28px; }
+.nav-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  text-decoration: none; color: inherit;
+  padding: 4px 0;
+  border-bottom: var(--hair) solid transparent;
+  transition: border-color .08s ease;
+}
+.nav-link:hover { border-bottom-color: currentColor; }
+.nav-link-num {
+  opacity: 0.5;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  margin-right: 4px;
+  font-size: 11px;
 }
 
 /* ================================================================
-   PAGE SECTIONS — ALTERNATING FULL-BLEED
+   SECTIONS
    ================================================================ */
 .page-section {
   position: relative;
   width: 100%;
-  overflow: hidden;  /* clips the parallax display words at section edges */
-  scroll-margin-top: 82px;  /* anchor jumps clear the fixed nav */
+  overflow: hidden;
+  scroll-margin-top: 78px;
 }
+.section-crimson { background: var(--crimson); color: var(--cream); }
+.section-cream   { background: var(--cream);   color: var(--crimson); }
 
-.section-crimson {
-  background: #e40038;
-  color: #faf3e9;
-}
-
-.section-cream {
-  background: #faf3e9;
-  color: #e40038;
-}
-
-/* Inner content container — centered, max-width ~960px */
 .section-inner {
-  position: relative;
-  z-index: 2;  /* sits above the parallax word */
-  max-width: 960px;
+  position: relative; z-index: 2;
+  max-width: var(--content-max);
   margin: 0 auto;
-  padding: 120px 40px 100px;
+  padding: var(--section-pad-y) var(--section-pad-x);
 }
-
-/* First section needs top padding to clear the fixed nav */
+/* Hero anchors to the top of the section so swapping copy between
+   Arrakis / Night City (which subtly changes line-wrap heights) does
+   NOT shift the headline, kicker, or CTAs vertically. */
 .hero-inner {
-  padding-top: 160px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: clamp(120px, 18vh, 220px);
+}
+/* Reserve worst-case line space for the variable-length copy so a
+   2-line vs 3-line wrap doesn't push the CTA row down. */
+#heroKicker { min-height: 1.6em; display: inline-flex; align-items: center; }
+#heroSub { min-height: calc(1.45em * 3); }
+
+/* Anchor the CTA row so the worm-ring and secondary button don't
+   slide horizontally when the primary label shortens ("SUMMON THE BOT"
+   → "JACK IN") or the secondary lengthens ("READ THE DOSSIER" →
+   "READ THE SPECSHEET"). Min-widths are sized to the WORST-CASE
+   rendered width across both themes plus a couple px of safety. */
+.hero-cta-row .btn-filled {
+  min-width: 178px;
+  justify-content: center;
+}
+.hero-cta-row .btn:not(.btn-filled) {
+  min-width: 168px;
+  justify-content: center;
+}
+.hero-cta-row .btn-filled .lbl {
+  display: inline-flex;
+  justify-content: center;
 }
 
-/* ================================================================
-   SECTION COUNTER & LABELS
-   ================================================================ */
-.section-counter {
-  display: block;
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: inherit;
-  opacity: 0.7;
-  margin-bottom: 32px;
+/* The cracked second word's left edge stays consistent across themes
+   now that the glitch class no longer adds extra letter-spacing —
+   the residual comma-vs-period width difference is sub-pixel. */
+.headline-hero .crack { margin-left: 0.22em; }
+
+.section-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 56px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  opacity: 0.75;
 }
+.section-header .counter { font-variant-numeric: tabular-nums; }
+.section-header .meta { display: flex; gap: 18px; }
 
 .section-label {
   font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: inherit;
-  margin-bottom: 40px;
-  opacity: 0.8;
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0.85;
 }
 
 /* ================================================================
-   HERO SECTION TYPOGRAPHY
+   HERO
    ================================================================ */
 .jp-kicker {
   font-family: 'Mochiy Pop One', sans-serif;
-  font-size: clamp(18px, 3.5vw, 36px);
-  letter-spacing: -0.02em;
-  color: inherit;
-  text-transform: none;
-  margin-bottom: 20px;
+  font-size: clamp(18px, 2.8vw, 30px);
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
   line-height: 1.1;
 }
-
 .headline-hero {
   font-family: 'Anton', sans-serif;
-  font-size: clamp(48px, 9vw, 120px);
+  font-size: clamp(52px, 12vw, 180px);
   text-transform: uppercase;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
-  color: inherit;
-  margin-bottom: 28px;
+  letter-spacing: 0.015em;
+  line-height: 1.02;
+  margin-bottom: 32px;
 }
+.headline-hero .crack {
+  display: inline-block;
+  position: relative;
+  margin-left: 0.22em;
+}
+.headline-hero .crack::after {
+  content: ""; position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 6px;
+  background: currentColor;
+  transform: scaleX(0); transform-origin: left;
+  animation: crack-in 1.2s 0.4s ease-out forwards;
+}
+@keyframes crack-in { to { transform: scaleX(0.6); } }
 
 .subtitle {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: clamp(14px, 2vw, 17px);
-  letter-spacing: -0.03em;
+  font-size: clamp(13px, 1.6vw, 16px);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: inherit;
-  max-width: 560px;
-  line-height: 1.4;
-}
-
-/* ================================================================
-   ABOUT / PORTRAIT SECTION
-   ================================================================ */
-.portrait-btn {
-  padding: 0;
-  border: none;
-  background: none;
-  display: block;
-  cursor: default;
-  margin-bottom: 32px;
-}
-
-/* The portrait image with 1px crimson hairline frame */
-.portrait-img {
-  display: block;
-  width: clamp(240px, 40%, 420px);
-  border: 1px solid #e40038;
-  border-radius: 0;
-}
-
-.fullDan {
-  display: block;
-  width: clamp(240px, 40%, 420px);
-}
-
-.danPicTog {
-  visibility: hidden;
-  width: 0 !important;
-  height: 0 !important;
-  padding: 0;
-  display: block;
-}
-
-.about-blurb {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: clamp(14px, 2vw, 17px);
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-  color: inherit;
-  max-width: 480px;
-  line-height: 1.4;
-}
-
-/* ================================================================
-   CHAT CTA SECTION
-   ================================================================ */
-.chat-cta-label {
-  font-family: 'Anton', sans-serif;
-  font-size: clamp(32px, 5vw, 64px);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  color: inherit;
-  margin-bottom: 24px;
-  line-height: 1;
-}
-
-.chat-cta-body {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: clamp(14px, 2vw, 17px);
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-  color: inherit;
-  max-width: 560px;
-  line-height: 1.4;
+  max-width: 580px;
+  line-height: 1.5;
   margin-bottom: 48px;
 }
 
-.hairline {
-  border: none;
-  border-top: 1px solid currentColor;
-  opacity: 0.5;
-  margin-bottom: 40px;
+.hero-cta-row {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  align-items: center;
 }
 
-.site-footer {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  color: inherit;
+.scroll-cue {
+  position: absolute;
+  bottom: 32px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0.7;
+  z-index: 3;
 }
-
-/* (footer counter removed — the section already shows its own "03 / 03") */
+.scroll-cue .bar {
+  display: inline-block;
+  width: 1px; height: 32px; background: currentColor;
+  animation: scroll-bar 1.6s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes scroll-bar { 0%, 100% { transform: scaleY(0.2); } 50% { transform: scaleY(1); } }
 
 /* ================================================================
-   PARALLAX DISPLAY WORDS
-   These sit absolutely within the section (overflow:hidden clips them),
-   positioned so they straddle the section edge. JS sets translateY.
+   BUTTONS
+   ================================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: 'Anton', sans-serif;
+  font-weight: 400; font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  border: var(--hair) solid currentColor;
+  background: transparent;
+  color: inherit;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 currentColor; }
+.btn-filled {
+  /* Inverted fill — explicit so it survives across sections */
+  background: var(--cream);
+  color: var(--crimson);
+  border-color: var(--cream);
+}
+.section-cream .btn-filled {
+  background: var(--crimson);
+  color: var(--cream);
+  border-color: var(--crimson);
+}
+.btn-filled .lbl { color: inherit; }
+
+.btn-arrow {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, 1px);
+}
+
+.btn-nc-toggle {
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border: var(--hair) solid var(--cream);
+  background: var(--cream);
+  color: var(--crimson);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.site-nav[data-theme="cream"] .btn-nc-toggle {
+  background: var(--crimson);
+  color: var(--cream);
+  border-color: var(--crimson);
+}
+.btn-nc-toggle:hover { background: transparent; color: inherit; }
+
+/* ================================================================
+   PARALLAX MARQUEE WORDS
    ================================================================ */
 .parallax-word {
   position: absolute;
-  left: 50%;
-  /* initial center; JS will compute top offset per-word */
-  top: 50%;
+  left: 50%; top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 0;
   font-family: 'Anton', sans-serif;
-  font-size: clamp(120px, 18vw, 248px);
+  font-size: clamp(140px, 18vw, 280px);
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 1;
   white-space: nowrap;
   color: currentColor;
-  opacity: 0.08;    /* subtle ghost — sits behind content */
+  opacity: 0.05;
   pointer-events: none;
   user-select: none;
   will-change: transform;
 }
 
-/* On crimson sections the ghost word uses cream tint;
-   on cream sections it uses a crimson tint.
-   We achieve this by inheriting color from the section. */
-
 /* ================================================================
-   VIDEO BACKGROUND (Night City)
+   CARTOUCHE FRAME — concave corners
    ================================================================ */
-.video {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  min-width: 100%;
-  min-height: 100%;
-  z-index: -1;
+.cartouche {
+  position: relative;
+  display: inline-block;
+  padding: 22px;
+}
+.cartouche-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.cartouche-svg path,
+.cartouche-svg rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.cartouche-inner {
+  position: relative;
+  z-index: 1;
 }
 
-.cBgHide {
-  visibility: hidden;
-  height: 0;
-  width: 0;
-  position: absolute;
+/* ================================================================
+   ABOUT SECTION
+   ================================================================ */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) 1.1fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: start;
 }
 
-/* ================================================================
-   TOGGLE BUTTON (nav area)
-   ================================================================ */
-.btnJp {
-  background: #faf3e9;
-  color: #e40038;
-  border: 1px solid #faf3e9;
-  border-radius: 0;
+.portrait-wrap {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  position: relative;
+}
+.portrait-wrap .cartouche {
+  width: 100%; height: 100%;
+  display: block;
+  padding: 14px;
+}
+.portrait-wrap .cartouche-inner {
+  width: 100%; height: 100%;
+  background: currentColor;
+  overflow: hidden;
+}
+.portrait-wrap .cartouche-inner img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05) saturate(0.7);
+}
+.section-crimson .portrait-wrap .cartouche-inner img { mix-blend-mode: screen; filter: contrast(1.1) saturate(0.6); }
+
+.bio {
+  display: flex; flex-direction: column;
+  gap: 28px;
+}
+.bio-headline {
   font-family: 'Anton', sans-serif;
-  font-weight: 400;
+  font-size: clamp(28px, 4vw, 56px);
+  text-wrap: balance;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  line-height: 1.06;
+}
+.bio-body {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 17px; line-height: 1.5;
+  letter-spacing: -0.01em;
+  max-width: 52ch;
+  /* Reserve room for the longer Night City variant so the stat-grid
+     below stays anchored when the user toggles themes. */
+  min-height: 8lh;
+  text-transform: none;
+}
+
+.stat-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: var(--hair) solid currentColor;
+  border-left: var(--hair) solid currentColor;
+}
+.stat {
+  border-right: var(--hair) solid currentColor;
+  border-bottom: var(--hair) solid currentColor;
+  padding: 18px 20px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+  min-height: 96px;
+}
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  opacity: 0.7;
+}
+.stat-value {
+  font-family: 'Anton', sans-serif;
+  font-size: 26px;
   text-transform: uppercase;
   letter-spacing: -0.02em;
-  font-size: 14px;
-  padding: 10px 24px;
+  line-height: 1.08;
+}
+
+/* ================================================================
+   CAPABILITIES / ACCORDION
+   ================================================================ */
+.cap-intro {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: clamp(28px, 5vw, 64px);
+  margin-bottom: 64px;
+  align-items: end;
+}
+.cap-display {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(48px, 8vw, 128px);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+.cap-blurb {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  text-transform: none;
+  font-size: 16px; line-height: 1.5;
+  letter-spacing: -0.01em;
+  max-width: 42ch;
+}
+
+.accordion { border-top: var(--hair) solid currentColor; }
+
+.acc-row {
+  border-bottom: var(--hair) solid currentColor;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  display: inline-block;
-  white-space: nowrap;
+  transition: background .18s ease, color .18s ease;
 }
-
-.btnJp:hover {
-  background: transparent;
-  color: #faf3e9;
-  border-color: #faf3e9;
+.acc-row > .acc-head {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 24px;
+  align-items: baseline;
+  padding: 22px var(--section-pad-x);
+  margin: 0 calc(-1 * var(--section-pad-x));
 }
-
-/* Over a cream section the button inverts */
-.site-nav[data-theme="cream"] .btnJp {
-  background: #e40038;
-  color: #faf3e9;
-  border-color: #e40038;
+.acc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
 }
-
-.site-nav[data-theme="cream"] .btnJp:hover {
-  background: transparent;
-  color: #e40038;
-  border-color: #e40038;
+.acc-title {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(22px, 3vw, 36px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
-
-.nav-toggle-wrap {
+.acc-plus {
+  width: 24px; height: 24px;
+  position: relative;
   flex-shrink: 0;
 }
+.acc-plus::before, .acc-plus::after {
+  content: ""; position: absolute;
+  background: currentColor;
+  transition: transform .25s ease;
+}
+.acc-plus::before { left: 0; right: 0; top: calc(50% - 1px); height: 2px; }
+.acc-plus::after  { top: 0; bottom: 0; left: calc(50% - 1px); width: 2px; }
+
+.acc-row.open .acc-plus::after { transform: rotate(90deg); opacity: 0; }
+
+.acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .35s ease;
+}
+.acc-body > div {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 24px;
+  padding: 0 var(--section-pad-x);
+  margin: 0 calc(-1 * var(--section-pad-x));
+}
+.acc-body-inner {
+  padding-bottom: 28px;
+  padding-top: 4px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  max-width: 60ch;
+}
+.acc-body .spacer { /* aligns under acc-num */ }
+
+.acc-row.open .acc-body { grid-template-rows: 1fr; }
+
+.acc-row:hover { background: var(--cream); color: var(--crimson); }
+.section-cream .acc-row:hover { background: var(--crimson); color: var(--cream); }
 
 /* ================================================================
-   NIGHT CITY TOGGLE BUTTON — "Back to Arrakis" state
+   MEME GALLERY
    ================================================================ */
-.btn-night-city {
-  background: #FFEB0B;
-  color: #000;
-  border: 2px solid #FFEB0B;
-  border-radius: 0;
-  font-family: 'Anton', sans-serif;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 14px;
-  padding: 10px 24px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-  display: inline-block;
-  white-space: nowrap;
-  box-shadow: 4px 0px 0px #00E6F6;
+.meme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(20px, 3vw, 36px);
 }
-
-.btn-night-city:hover {
-  background: #000;
-  color: #FFEB0B;
-}
-
-/* ================================================================
-   NIGHT CITY THEME  (.night-city on <body>)
-   Everything inside .night-city overrides Arrakis defaults.
-   ================================================================ */
-
-/* Body base */
-.night-city {
-  background: #000;
-  color: #FFEB0B;
-}
-
-/* Override section colours */
-.night-city .page-section {
-  background: #000 !important;
-  color: #FFEB0B !important;
-}
-
-/* Nav */
-.night-city .site-nav {
-  border-bottom-color: #FFEB0B;
-  color: #FFEB0B !important;
-}
-
-.night-city .site-nav[data-theme] {
-  color: #FFEB0B !important;
-}
-
-.night-city .nav-link {
-  color: #FFEB0B;
-}
-
-/* Parallax words */
-.night-city .parallax-word {
-  color: #FFEB0B !important;
-  opacity: 0.12;
-}
-
-/* Portrait border */
-.night-city .portrait-img {
-  border-color: #FFEB0B;
-  filter: saturate(0.4) contrast(1.2) brightness(0.85);
-}
-
-/* Hairline */
-.night-city .hairline {
-  border-top-color: #FFEB0B;
-}
-
-/* All glitch-text elements get the glitch pseudo-layer treatment */
-.night-city .glitch-text {
+.meme-tile {
+  aspect-ratio: 1 / 1;
   position: relative;
-  font-family: 'Anton', sans-serif;
-  color: #FFEB0B;
-  filter: drop-shadow(0 1px 3px rgba(0,230,246,0.4));
-  letter-spacing: 6px;
+}
+.meme-tile .cartouche {
+  width: 100%; height: 100%;
+  display: block;
+  padding: 12px;
+}
+.meme-tile .cartouche-inner {
+  width: 100%; height: 100%;
+  background: var(--crimson);
+  overflow: hidden;
+  position: relative;
+}
+.meme-tile.tone-cream .cartouche-inner { background: var(--cream); }
+.meme-tile.tone-ink   .cartouche-inner { background: var(--ink); }
+
+.meme-tile img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;
+}
+.meme-tile .meme-caption {
+  position: absolute;
+  left: 18px; bottom: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--cream);
+  mix-blend-mode: difference;
+}
+.meme-tile .meme-tag {
+  position: absolute;
+  left: 18px; top: 18px;
+  font-family: 'Anton', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: var(--crimson);
+  padding: 4px 10px;
+  z-index: 2;
 }
 
-.night-city .glitch-text::before,
-.night-city .glitch-text::after {
+.meme-tile .placeholder {
+  width: 100%; height: 100%;
+  display: grid; place-items: center;
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(255,255,255,0.04) 0 12px,
+      rgba(0,0,0,0.02) 12px 24px);
+}
+.meme-tile .placeholder span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--cream); letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+/* ================================================================
+   CHAT SECTION
+   ================================================================ */
+.chat-section .section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 80px); align-items: start; }
+
+.chat-pitch h2 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(56px, 9vw, 140px);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+  margin-bottom: 24px;
+}
+.chat-pitch p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  margin-bottom: 24px;
+  max-width: 46ch;
+}
+.chat-suggestions {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 24px;
+}
+.chat-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: var(--hair) solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  border-radius: 0;
+}
+.chat-chip:hover { background: var(--cream); color: var(--crimson); }
+.section-cream .chat-chip:hover { background: var(--crimson); color: var(--cream); }
+
+/* Chat window */
+.chat-window {
+  background: var(--cream);
+  color: var(--crimson);
+  height: 540px;
+  display: flex; flex-direction: column;
+  border: var(--hair) solid currentColor;
+}
+.section-cream .chat-window {
+  background: var(--crimson); color: var(--cream);
+}
+.chat-titlebar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: var(--hair) solid currentColor;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chat-dots { display: flex; gap: 6px; }
+.chat-dots span {
+  width: 8px; height: 8px;
+  background: currentColor;
+  display: inline-block;
+}
+.chat-status {
+  display: flex; align-items: center; gap: 8px;
+}
+.chat-status .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: currentColor;
+  animation: brand-pulse 1.4s steps(2) infinite;
+}
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: currentColor transparent;
+}
+.chat-log::-webkit-scrollbar { width: 6px; }
+.chat-log::-webkit-scrollbar-thumb { background: currentColor; }
+.msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  max-width: 90%;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.msg-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 4px;
+}
+.msg-bot { align-self: flex-start; }
+.msg-user { align-self: flex-end; text-align: right; }
+.msg-bot .msg-body { padding: 8px 12px; border: var(--hair) solid currentColor; }
+.msg-user .msg-body { padding: 8px 12px; background: var(--crimson); color: var(--cream); }
+.section-cream .msg-user .msg-body { background: var(--cream); color: var(--crimson); }
+.msg-typing .msg-body { display: inline-flex; gap: 4px; padding: 10px 14px; border: var(--hair) solid currentColor; }
+.msg-typing .msg-body span {
+  width: 6px; height: 6px; background: currentColor;
+  display: inline-block;
+  animation: typing-bounce 1s infinite;
+}
+.msg-typing .msg-body span:nth-child(2) { animation-delay: 0.15s; }
+.msg-typing .msg-body span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-bounce { 0%, 100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-4px); opacity: 1; } }
+
+.chat-input-row {
+  display: flex;
+  border-top: var(--hair) solid currentColor;
+}
+.chat-input {
+  flex: 1;
+  padding: 14px 16px;
+  background: transparent;
+  color: inherit;
+  border: none;
+  outline: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: -0.005em;
+}
+.chat-input::placeholder { color: currentColor; opacity: 0.5; }
+.chat-send {
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 22px;
+  background: var(--crimson);
+  color: var(--cream);
+  border: none;
+  border-left: var(--hair) solid currentColor;
+  cursor: pointer;
+}
+.section-cream .chat-send { background: var(--cream); color: var(--crimson); }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.site-footer {
+  padding: var(--section-pad-y) var(--section-pad-x);
+  background: var(--cream);
+  color: var(--crimson);
+}
+.foot-grid {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  border-top: var(--hair) solid currentColor;
+  padding-top: 48px;
+}
+.foot-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 18px;
+  opacity: 0.7;
+}
+.foot-link {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(28px, 4vw, 48px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: inherit; text-decoration: none;
+  display: inline-block;
+  border-bottom: var(--hair) solid transparent;
+}
+.foot-link:hover { border-bottom-color: currentColor; }
+.foot-socials {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.foot-socials a {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(20px, 2.5vw, 32px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: inherit; text-decoration: none;
+  display: flex; align-items: center; gap: 14px;
+  border-bottom: var(--hair) solid transparent;
+}
+.foot-socials a:hover { border-bottom-color: currentColor; }
+.foot-socials a .arr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  opacity: 0.5;
+}
+.foot-bar {
+  max-width: var(--content-max);
+  margin: 64px auto 0;
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* ================================================================
+   NIGHT CITY MODE
+   ================================================================ */
+body.night-city {
+  --bg: var(--nc-bg);
+  --fg: var(--nc-yellow);
+  background: var(--nc-bg);
+  color: var(--nc-yellow);
+}
+body.night-city .page-section {
+  background: var(--nc-bg) !important;
+  color: var(--nc-yellow) !important;
+}
+body.night-city .site-nav,
+body.night-city .site-nav[data-theme] { color: var(--nc-yellow) !important; border-bottom-color: var(--nc-yellow); background-color: color-mix(in oklab, var(--nc-bg) 82%, transparent); }
+body.night-city .site-footer { background: var(--nc-bg); color: var(--nc-yellow); }
+body.night-city .btn-nc-toggle { color: var(--nc-bg); background: var(--nc-yellow); border-color: var(--nc-yellow); box-shadow: 4px 0 0 var(--nc-cyan); }
+body.night-city .btn-nc-toggle:hover { background: transparent; color: var(--nc-yellow); }
+body.night-city .meme-tile .cartouche-inner { background: #161616; }
+body.night-city .meme-tile img { filter: hue-rotate(-10deg) saturate(0.6) contrast(1.15) brightness(0.85); }
+body.night-city .portrait-wrap .cartouche-inner { background: var(--nc-yellow); }
+body.night-city .portrait-wrap .cartouche-inner img { mix-blend-mode: multiply; filter: contrast(1.1) saturate(0.4) hue-rotate(-12deg); }
+body.night-city .chat-window { background: #0e0e0e; color: var(--nc-yellow); border-color: var(--nc-yellow); }
+body.night-city .chat-send { background: var(--nc-yellow); color: var(--nc-bg); }
+body.night-city .msg-user .msg-body { background: var(--nc-yellow); color: var(--nc-bg); }
+body.night-city .acc-row:hover { background: var(--nc-yellow); color: var(--nc-bg); }
+body.night-city .chat-chip:hover { color: var(--nc-bg); }
+body.night-city .parallax-word { opacity: 0.09; }
+
+/* Glitch text — pseudo-element layers */
+body.night-city .glitch {
+  position: relative;
+  color: var(--nc-yellow);
+  filter: drop-shadow(0 0 8px rgba(0,230,246,0.15));
+}
+body.night-city .glitch::before,
+body.night-city .glitch::after {
   content: attr(data-text);
   position: absolute;
-  width: 110%;
-  left: 0;
-  top: 0;
-  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
-
-.night-city .glitch-text::before {
-  top: 8px;
-  left: 12px;
-  color: #e0287d;
-  animation:
-    nc-paths 5s step-end infinite,
-    nc-opacity 5s step-end infinite,
-    nc-font 8s step-end infinite,
-    nc-movement 10s step-end infinite;
+body.night-city .glitch::before {
+  color: var(--nc-pink);
+  left: calc(2px * var(--glitch-amount));
+  top:  calc(1px * var(--glitch-amount));
+  animation: nc-paths 5s steps(8, end) infinite, nc-opacity 5s steps(6, end) infinite;
 }
-
-.night-city .glitch-text::after {
-  top: 4px;
-  left: -8px;
-  color: #1bc7fb;
-  animation:
-    nc-paths 5s step-end infinite,
-    nc-opacity 5s step-end infinite,
-    nc-font 7s step-end infinite,
-    nc-movement 8s step-end infinite;
+body.night-city .glitch::after {
+  color: var(--nc-cyan);
+  left: calc(-3px * var(--glitch-amount));
+  top:  calc(-1px * var(--glitch-amount));
+  animation: nc-paths 7s steps(8, end) infinite reverse, nc-opacity 7s steps(6, end) infinite;
 }
-
-/* Glitch pseudo-layer sits properly above page bg */
-.night-city .headline-hero {
-  line-height: 1.1;
-  font-size: clamp(32px, 7vw, 90px);
-}
-
-.night-city .subtitle {
-  color: #faf3e9;
-  letter-spacing: 2px;
-}
-
-.night-city .jp-kicker {
-  color: #00E6F6;
-}
-
-.night-city .section-counter,
-.night-city .section-label,
-.night-city .about-blurb,
-.night-city .chat-cta-body,
-.night-city .site-footer {
-  color: #faf3e9;
-}
-
-.night-city .chat-cta-label {
-  color: #FFEB0B;
-}
-
-/* Night City section counters */
-.night-city .section-counter {
-  color: #FFEB0B;
-  opacity: 1;
-}
-
-/* Video bg shows in Night City */
-.night-city .cBgHide {
-  visibility: visible;
-  height: auto;
-  width: auto;
-  position: fixed;
-}
-
-/* ================================================================
-   GLITCH KEYFRAMES — Night City pseudo-layers
-   ================================================================ */
 @keyframes nc-paths {
-  0% {
-    clip-path: polygon(
-      0% 43%, 83% 43%, 83% 22%, 23% 22%, 23% 24%,
-      91% 24%, 91% 26%, 18% 26%, 18% 83%, 29% 83%,
-      29% 17%, 41% 17%, 41% 39%, 18% 39%, 18% 82%,
-      54% 82%, 54% 88%, 19% 88%, 19% 4%, 39% 4%,
-      39% 14%, 76% 14%, 76% 52%, 23% 52%, 23% 35%,
-      19% 35%, 19% 8%, 36% 8%, 36% 31%, 73% 31%,
-      73% 16%, 1% 16%, 1% 56%, 50% 56%, 50% 8%
-    );
-  }
-  5% {
-    clip-path: polygon(
-      0% 29%, 44% 29%, 44% 83%, 94% 83%, 94% 56%,
-      11% 56%, 11% 64%, 94% 64%, 94% 70%, 88% 70%,
-      88% 32%, 18% 32%, 18% 96%, 10% 96%, 10% 62%,
-      9% 62%, 9% 84%, 68% 84%, 68% 50%, 52% 50%,
-      52% 55%, 35% 55%, 35% 87%, 25% 87%, 25% 39%,
-      15% 39%, 15% 88%, 52% 88%
-    );
-  }
-  30% {
-    clip-path: polygon(
-      0% 53%, 93% 53%, 93% 62%, 68% 62%, 68% 37%,
-      97% 37%, 97% 89%, 13% 89%, 13% 45%, 51% 45%,
-      51% 88%, 17% 88%, 17% 54%, 81% 54%, 81% 75%,
-      79% 75%, 79% 76%, 38% 76%, 38% 28%, 61% 28%,
-      61% 12%, 55% 12%, 55% 62%, 68% 62%, 68% 51%,
-      0% 51%, 0% 92%, 63% 92%, 63% 4%, 65% 4%
-    );
-  }
-  45% {
-    clip-path: polygon(
-      0% 33%, 2% 33%, 2% 69%, 58% 69%, 58% 94%,
-      55% 94%, 55% 25%, 33% 25%, 33% 85%, 16% 85%,
-      16% 19%, 5% 19%, 5% 20%, 79% 20%, 79% 96%,
-      93% 96%, 93% 50%, 5% 50%, 5% 74%, 55% 74%,
-      55% 57%, 96% 57%, 96% 59%, 87% 59%, 87% 65%,
-      82% 65%, 82% 39%, 63% 39%, 63% 92%, 4% 92%,
-      4% 36%, 24% 36%, 24% 70%, 1% 70%, 1% 43%,
-      15% 43%, 15% 28%, 23% 28%, 23% 71%, 90% 71%,
-      90% 86%, 97% 86%, 97% 1%, 60% 1%, 60% 67%,
-      71% 67%, 71% 91%, 17% 91%, 17% 14%, 39% 14%,
-      39% 30%, 58% 30%, 58% 11%, 52% 11%, 52% 83%, 68% 83%
-    );
-  }
-  76% {
-    clip-path: polygon(
-      0% 26%, 15% 26%, 15% 73%, 72% 73%, 72% 70%,
-      77% 70%, 77% 75%, 8% 75%, 8% 42%, 4% 42%,
-      4% 61%, 17% 61%, 17% 12%, 26% 12%, 26% 63%,
-      73% 63%, 73% 43%, 90% 43%, 90% 67%, 50% 67%,
-      50% 41%, 42% 41%, 42% 46%, 50% 46%, 50% 84%,
-      96% 84%, 96% 78%, 49% 78%, 49% 25%, 63% 25%, 63% 14%
-    );
-  }
-  90% {
-    clip-path: polygon(
-      0% 41%, 13% 41%, 13% 6%, 87% 6%, 87% 93%,
-      10% 93%, 10% 13%, 89% 13%, 89% 6%, 3% 6%,
-      3% 8%, 16% 8%, 16% 79%, 0% 79%, 0% 99%,
-      92% 99%, 92% 90%, 5% 90%, 5% 60%, 0% 60%,
-      0% 48%, 89% 48%, 89% 13%, 80% 13%, 80% 43%,
-      95% 43%, 95% 19%, 80% 19%, 80% 85%, 38% 85%, 38% 62%
-    );
-  }
-  1%, 7%, 33%, 47%, 78%, 93% {
-    clip-path: none;
-  }
+  0%   { clip-path: inset(20% 0 60% 0); }
+  20%  { clip-path: inset(40% 0 30% 0); }
+  40%  { clip-path: inset(10% 0 70% 0); }
+  60%  { clip-path: inset(70% 0 10% 0); }
+  80%  { clip-path: inset(50% 0 30% 0); }
+  100% { clip-path: inset(80% 0 5%  0); }
 }
-
-@keyframes nc-movement {
-  0%   { transform: translate(-20px, 0px); }
-  15%  { transform: translate(10px, 10px); }
-  60%  { transform: translate(-10px, 5px); }
-  75%  { transform: translate(20px, -5px); }
-  100% { transform: translate(5px, 10px); }
-}
-
 @keyframes nc-opacity {
-  0%  { opacity: 0.1; }
-  5%  { opacity: 0.7; }
-  30% { opacity: 0.4; }
-  45% { opacity: 0.6; }
-  76% { opacity: 0.4; }
-  90% { opacity: 0.8; }
-  1%, 7%, 33%, 47%, 78%, 93% { opacity: 0; }
+  0%, 100% { opacity: 0.4; }
+  10%      { opacity: 0; }
+  30%      { opacity: 0.8; }
+  50%      { opacity: 0.2; }
+  70%      { opacity: 0.6; }
 }
 
-@keyframes nc-font {
-  0%  { color: #e0287d; filter: blur(3px); }
-  20% { color: #fff;    filter: blur(0);   }
-  50% { color: #1bc7fb; filter: blur(2px); }
-  60% { color: #fff;    filter: blur(0);   }
-  90% { color: #e0287d; filter: blur(6px); }
+/* CRT scanlines in Night City */
+body.night-city::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,230,246,0.02) 0 1px,
+      transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+body.night-city::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 201;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
 }
 
 /* ================================================================
-   BTN GLITCH — Night City hover effect on toggle
+   TWEAKS PANEL — minimal native
    ================================================================ */
-.btn-night-city::after {
-  --slice-0: inset(50% 50% 50% 50%);
-  --slice-1: inset(80% -6px 0 0);
-  --slice-2: inset(50% -6px 30% 0);
-  --slice-3: inset(10% -6px 85% 0);
-  --slice-4: inset(40% -6px 43% 0);
-  --slice-5: inset(80% -6px 5% 0);
-  content: 'BACK TO ARRAKIS';
-  display: block;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(45deg, transparent 3%, #00E6F6 3%, #00E6F6 5%, #FFEB0B 5%);
-  text-shadow: -3px -3px 0px #F8F005, 3px 3px 0px #00E6F6;
-  clip-path: var(--slice-0);
+.tweaks-panel {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 999;
+  width: 280px;
+  background: var(--cream);
+  color: var(--crimson);
+  border: var(--hair) solid currentColor;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: none;
 }
+.tweaks-panel.open { display: block; }
+body.night-city .tweaks-panel { background: #0e0e0e; color: var(--nc-yellow); border-color: var(--nc-yellow); }
 
-.btn-night-city {
+.tweaks-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px;
+  border-bottom: var(--hair) solid currentColor;
+}
+.tweaks-head .x {
+  cursor: pointer; padding: 4px 6px;
+  font-family: 'Anton', sans-serif; font-size: 14px;
+}
+.tweaks-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.tweaks-row { display: flex; flex-direction: column; gap: 6px; }
+.tweaks-row label { opacity: 0.7; font-size: 10px; }
+.tweaks-row .seg {
+  display: flex;
+  border: var(--hair) solid currentColor;
+}
+.tweaks-row .seg button {
+  flex: 1;
+  padding: 8px 6px;
+  border: none; background: transparent;
+  color: inherit; cursor: pointer;
+  font-family: 'Anton', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-right: var(--hair) solid currentColor;
+}
+.tweaks-row .seg button:last-child { border-right: none; }
+.tweaks-row .seg button.active { background: var(--crimson); color: var(--cream); }
+body.night-city .tweaks-row .seg button.active { background: var(--nc-yellow); color: var(--nc-bg); }
+.tweaks-row input[type="range"] {
+  width: 100%; accent-color: currentColor;
+}
+.tweaks-row .swatches { display: flex; gap: 8px; }
+.tweaks-row .swatch {
+  width: 28px; height: 28px;
+  border: var(--hair) solid currentColor;
+  cursor: pointer;
   position: relative;
 }
-
-.btn-night-city:hover::after {
-  animation: nc-btn-glitch 1s steps(2, end);
+.tweaks-row .swatch.active::after {
+  content: ""; position: absolute; inset: 3px;
+  border: 1px solid var(--cream);
 }
-
-@keyframes nc-btn-glitch {
-  0%   { clip-path: var(--slice-1); transform: translate(-20px, -10px); }
-  10%  { clip-path: var(--slice-3); transform: translate(10px, 10px);   }
-  20%  { clip-path: var(--slice-1); transform: translate(-10px, 10px);  }
-  30%  { clip-path: var(--slice-3); transform: translate(0px, 5px);     }
-  40%  { clip-path: var(--slice-2); transform: translate(-5px, 0px);    }
-  50%  { clip-path: var(--slice-3); transform: translate(5px, 0px);     }
-  60%  { clip-path: var(--slice-4); transform: translate(5px, 10px);    }
-  70%  { clip-path: var(--slice-2); transform: translate(-10px, 10px);  }
-  80%  { clip-path: var(--slice-5); transform: translate(20px, -10px);  }
-  90%  { clip-path: var(--slice-1); transform: translate(-10px, 0px);   }
-  100% { clip-path: var(--slice-1); transform: translate(0);            }
-}
+body.night-city .tweaks-row .swatch.active::after { border-color: var(--nc-bg); }
 
 /* ================================================================
-   PREFERS-REDUCED-MOTION
-   Disable parallax translateY transitions and nav slide animation.
+   RESPONSIVE
    ================================================================ */
+@media (max-width: 880px) {
+  .nav-inner { gap: 16px; }
+  .nav-link { font-size: 11px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .cap-intro { grid-template-columns: 1fr; gap: 28px; }
+  .chat-section .section-inner { grid-template-columns: 1fr; }
+  .meme-grid { grid-template-columns: 1fr; }
+  .foot-grid { grid-template-columns: 1fr; }
+  .acc-row > .acc-head { grid-template-columns: 60px 1fr auto; gap: 14px; padding: 18px var(--section-pad-x); }
+  .acc-body > div { grid-template-columns: 60px 1fr; gap: 14px; }
+  .tweaks-panel { right: 12px; bottom: 12px; width: calc(100vw - 24px); max-width: 320px; }
+  .stat-grid { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .site-nav {
-    transition: none;
-  }
-  .parallax-word {
-    /* JS checks this and skips parallax updates */
-  }
-  .night-city .glitch-text::before,
-  .night-city .glitch-text::after {
-    animation: none;
-    display: none;
-  }
-  .btn-night-city:hover::after {
-    animation: none;
-  }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
 /* ================================================================
-   MOBILE BREAKPOINTS
+   DIALOGFLOW df-messenger THEME — scoped per body class
+   Arrakis: spice orange / desert cream
+   Night City: yellow / near-black
    ================================================================ */
-@media only screen and (max-width: 768px) {
-  .site-nav {
-    padding: 0 20px;
-    height: 64px;
-  }
 
-  .nav-inner {
-    gap: 20px;
-  }
-
-  .nav-link {
-    font-size: 12px;
-  }
-
-  .btnJp,
-  .btn-night-city {
-    font-size: 11px;
-    padding: 8px 14px;
-  }
-
-  .section-inner {
-    padding: 80px 20px 72px;
-  }
-
-  .hero-inner {
-    padding-top: 100px;
-  }
-
-  .page-section {
-    scroll-margin-top: 64px;  /* mobile nav is shorter */
-  }
-
-  .portrait-img,
-  .fullDan {
-    width: 100%;
-    max-width: 340px;
-  }
-
-  .video {
-    position: fixed;
-    height: 400px;
-    width: 400px;
-    right: auto;
-    bottom: auto;
-  }
-
-  .parallax-word {
-    font-size: clamp(80px, 22vw, 140px);
-  }
+/* Arrakis (default) */
+body.arrakis df-messenger {
+  --df-messenger-button-titlebar-color:  var(--crimson);
+  --df-messenger-button-titlebar-font-color: var(--cream);
+  --df-messenger-chat-background-color:  var(--cream);
+  --df-messenger-font-color:             var(--cream);
+  --df-messenger-bot-message:            var(--crimson);
+  --df-messenger-user-message:           var(--crimson);
+  --df-messenger-send-icon:              var(--crimson);
+  --df-messenger-input-box-color:        #f5ead0;
+  --df-messenger-input-font-color:       var(--crimson);
+  --df-messenger-minimized-chat-close-icon-color: var(--cream);
 }
 
-/* Legacy font-face entries kept for any residual references */
-@font-face {
-  font-family: 'Play-reg';
-  src: url(/Fonts/Play-Regular.ttf);
-}
-
-@font-face {
-  font-family: 'Dune';
-  src: url(/Fonts/Dune_Rise.ttf);
+/* Night City */
+body.night-city df-messenger {
+  --df-messenger-button-titlebar-color:  var(--nc-yellow);
+  --df-messenger-button-titlebar-font-color: #0a0a0a;
+  --df-messenger-chat-background-color:  #111111;
+  --df-messenger-font-color:             var(--nc-yellow);
+  --df-messenger-bot-message:            #1a1a00;
+  --df-messenger-user-message:           #222200;
+  --df-messenger-send-icon:              var(--nc-yellow);
+  --df-messenger-input-box-color:        #1a1a1a;
+  --df-messenger-input-font-color:       var(--nc-yellow);
+  --df-messenger-minimized-chat-close-icon-color: #0a0a0a;
 }
