@@ -883,6 +883,85 @@
   }
 
   // -----------------------------------------------------------------
+  // Entry screen — first-load world picker
+  // -----------------------------------------------------------------
+  function initEntryScreen() {
+    const screen = document.getElementById('entryScreen');
+    if (!screen) return;
+    const ENTRY_KEY = 'danimemes.entered.v2';
+
+    // Fade out, then remove from paint/interaction after the CSS transition.
+    // 600 ms matches the entry-screen opacity transition in styles.css.
+    function close() {
+      screen.classList.add('entry-hidden');
+      screen.setAttribute('aria-hidden', 'true');
+      try { sessionStorage.setItem(ENTRY_KEY, '1'); } catch (_) {}
+      // Only set display:none AFTER the fade completes so the opacity
+      // transition is visible (Learnings #16).
+      setTimeout(() => { screen.style.display = 'none'; }, 600);
+    }
+
+    // Restore the screen: clear display:none first, force a reflow with
+    // void offsetWidth so the browser re-registers the start state, THEN
+    // remove entry-hidden so the fade-in transition replays (Learnings #16).
+    function open() {
+      screen.style.display = '';
+      // Reflow must happen between removing display:none and removing the
+      // hidden class, otherwise the browser skips the transition.
+      void screen.offsetWidth;
+      screen.classList.remove('entry-hidden');
+      screen.setAttribute('aria-hidden', 'false');
+    }
+
+    // Session gate: if the user has already picked a world this session,
+    // suppress the overlay instantly (no fade — it was never visible).
+    let entered = false;
+    try { entered = sessionStorage.getItem(ENTRY_KEY) === '1'; } catch (_) {}
+    if (entered) {
+      screen.classList.add('entry-hidden');
+      screen.style.display = 'none';
+      screen.setAttribute('aria-hidden', 'true');
+    }
+
+    // Card clicks — set world + accent, save, apply, then fade out.
+    screen.querySelectorAll('.entry-card').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = btn.dataset.world;
+        if (next && next !== state.theme) {
+          state.theme  = next;
+          state.accent = DEFAULT_ACCENT_FOR_THEME[next] || 'crimson';
+          saveState(state);
+          applyTheme(state.theme);
+          applyAccent(state.accent);
+          paintTweaks();
+        }
+        close();
+      });
+    });
+
+    // SKIP — dismiss without changing the current world.
+    const skip = screen.querySelector('.entry-skip');
+    if (skip) skip.addEventListener('click', close);
+
+    // Esc key — same as SKIP; only acts when the screen is actually visible.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !screen.classList.contains('entry-hidden')) close();
+    });
+
+    // Footer "↻ CHANGE WORLD" link — re-show the overlay.
+    // Note: we clear the session flag on manual reopen so that if the user
+    // picks a card the close() path re-sets the flag correctly.
+    const reopen = document.getElementById('reopenEntry');
+    if (reopen) {
+      reopen.addEventListener('click', (e) => {
+        e.preventDefault();
+        try { sessionStorage.removeItem(ENTRY_KEY); } catch (_) {}
+        open();
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------
   // Boot
   // -----------------------------------------------------------------
   function boot() {
@@ -893,6 +972,7 @@
     initChat();
     initTweaks();
     initWorldPicker();
+    initEntryScreen();
     // Start hiding df-messenger chrome as early as possible.
     // This runs in parallel with initChat's openChat call; the
     // re-injection timeouts inside scheduleDfHide + hideDfMessengerChrome
