@@ -1,6 +1,6 @@
 /* ================================================================
    DANIMEMES — index.js
-   - Arrakis ↔ Night City toggle (persisted)
+   - 4-way world theme engine (Arrakis / Night City / Old World / Grim Future)
    - Sticky nav hide/reveal + section color flip via IO
    - Parallax marquee words
    - Accordion expand
@@ -13,21 +13,69 @@
   const LS_KEY = 'danimemes.state.v2';
 
   // -----------------------------------------------------------------
+  // Theme constants
+  // -----------------------------------------------------------------
+  const THEME_ORDER = ['arrakis', 'night-city', 'oldworld', 'grimfuture'];
+  const THEME_LABELS = {
+    'arrakis':    'ARRAKIS',
+    'night-city': 'NIGHT CITY',
+    'oldworld':   'OLD WORLD',
+    'grimfuture': 'GRIM FUTURE',
+  };
+  // Map each theme to the data-* key used on copy elements.
+  const THEME_KEY = {
+    'arrakis':    'arr',
+    'night-city': 'nc',
+    'oldworld':   'ow',
+    'grimfuture': 'gf',
+  };
+  const ALL_THEME_CLASSES = ['arrakis', 'night-city', 'oldworld', 'grimfuture'];
+
+  // -----------------------------------------------------------------
   // Persisted state
   // -----------------------------------------------------------------
   const defaults = {
-    theme: 'arrakis',        // 'arrakis' | 'night-city'
-    accent: 'crimson',       // 'crimson' | 'ink' | 'navy' | 'olive'
+    theme: 'arrakis',        // 'arrakis' | 'night-city' | 'oldworld' | 'grimfuture'
+    accent: 'crimson',       // arrakis accents OR theme-specific accents
     density: 'comfortable',  // 'compact' | 'comfortable' | 'spacious'
     glitch: 1,
   };
 
+  // Per-theme accent palettes.
+  // Arrakis/Night City entries set crimson+cream CSS vars.
+  // Old World entries set --ow-oxblood + --ow-vellum.
+  // Grim Future entries set --gf-brass + --gf-void.
   const accents = {
+    // Arrakis palette
     crimson: { crimson: '#c8541a', cream: '#ede0bc' }, // Spice & Sand — Dune default
     classic: { crimson: '#e40038', cream: '#faf3e9' }, // Original crimson/cream
     ink:     { crimson: '#1c130a', cream: '#e6d3a3' }, // Sietch ink on sand
     navy:    { crimson: '#1f4e7a', cream: '#ede0bc' }, // Fremen blue on sand
     olive:   { crimson: '#3a4a1e', cream: '#f0e6c2' },
+    // Old World palette — dark-elf coded (midnight violet, moonstone, cruel blood)
+    oxblood: { owOxblood: '#1f1430', owVellum: '#c4bccc' }, // Midnight violet & moonstone (default)
+    forest:  { owOxblood: '#0e1d18', owVellum: '#b8c4b8' }, // Deep sea-elf green
+    iron:    { owOxblood: '#06030a', owVellum: '#b0a8ba' }, // Obsidian black
+    royal:   { owOxblood: '#161a3a', owVellum: '#c0c8d4' }, // Sapphire dark
+    // Grim Future palette — sororitas coded (pitch, cardinal red, gold, ivory)
+    brass:   { gfBrass: '#c89a3a', gfVoid: '#0a0608' }, // Sanctified gold on pitch (default)
+    ember:   { gfBrass: '#b81628', gfVoid: '#0a0408' }, // Cardinal red on pitch
+    bone:    { gfBrass: '#5a0a12', gfVoid: '#efe4cc' }, // Cardinal on ivory (inverted)
+    void:    { gfBrass: '#7894b8', gfVoid: '#06080e' }, // Cold ice-blue (rare order)
+  };
+
+  // Default accent per theme (applied when switching worlds).
+  const DEFAULT_ACCENT_FOR_THEME = {
+    'arrakis':    'crimson',
+    'night-city': 'crimson', // night city ignores accents mostly
+    'oldworld':   'oxblood',
+    'grimfuture': 'brass',
+  };
+  const ACCENTS_FOR_THEME = {
+    'arrakis':    ['crimson', 'classic', 'ink', 'navy', 'olive'],
+    'night-city': ['crimson'],
+    'oldworld':   ['oxblood', 'forest', 'iron', 'royal'],
+    'grimfuture': ['brass', 'ember', 'bone', 'void'],
   };
 
   function loadState() {
@@ -38,9 +86,16 @@
   const state = loadState();
 
   function applyAccent(name) {
-    const a = accents[name] || accents.crimson;
-    document.documentElement.style.setProperty('--crimson', a.crimson);
-    document.documentElement.style.setProperty('--cream', a.cream);
+    const a = accents[name];
+    if (!a) return;
+    // Branch on which keys the accent defines so a stale accent from another
+    // theme never writes to the wrong set of CSS custom properties.
+    if (a.crimson)    document.documentElement.style.setProperty('--crimson', a.crimson);
+    if (a.cream)      document.documentElement.style.setProperty('--cream', a.cream);
+    if (a.owOxblood)  document.documentElement.style.setProperty('--ow-oxblood', a.owOxblood);
+    if (a.owVellum)   document.documentElement.style.setProperty('--ow-vellum', a.owVellum);
+    if (a.gfBrass)    document.documentElement.style.setProperty('--gf-brass', a.gfBrass);
+    if (a.gfVoid)     document.documentElement.style.setProperty('--gf-void', a.gfVoid);
   }
 
   function applyDensity(name) {
@@ -59,30 +114,42 @@
   }
 
   function applyTheme(t) {
-    document.body.classList.toggle('night-city', t === 'night-city');
-    document.body.classList.toggle('arrakis', t !== 'night-city');
-    const tog = document.getElementById('ncToggle');
-    if (tog) tog.textContent = t === 'night-city' ? 'BACK TO ARRAKIS' : 'ENTER NIGHT CITY';
+    if (!THEME_KEY[t]) t = 'arrakis';
+    // Swap body class — exactly one theme class active at a time.
+    ALL_THEME_CLASSES.forEach((c) => document.body.classList.toggle(c, c === t));
 
-    // Copy swap — every element tagged data-arr / data-nc updates
+    // Paint the world picker — exactly one button .active / aria-selected.
+    document.querySelectorAll('.world-picker .world-btn').forEach((b) => {
+      const match = b.dataset.world === t;
+      b.classList.toggle('active', match);
+      b.setAttribute('aria-selected', match ? 'true' : 'false');
+    });
+
+    // Copy swap — every element tagged data-arr/data-nc/data-ow/data-gf updates.
     applyCopy(t);
   }
 
   function applyCopy(theme) {
-    const arr = theme !== 'night-city';
-    const key = arr ? 'arr' : 'nc';
-    const sel = '[data-arr], [data-nc], [data-arr-html], [data-nc-html], [data-arr-text], [data-nc-text], [data-arr-placeholder], [data-nc-placeholder]';
+    const key = THEME_KEY[theme] || 'arr';
+    const sel = [
+      '[data-arr], [data-nc], [data-ow], [data-gf]',
+      '[data-arr-html], [data-nc-html], [data-ow-html], [data-gf-html]',
+      '[data-arr-text], [data-nc-text], [data-ow-text], [data-gf-text]',
+      '[data-arr-placeholder], [data-nc-placeholder], [data-ow-placeholder], [data-gf-placeholder]',
+    ].join(', ');
     document.querySelectorAll(sel).forEach((el) => {
-      const html = el.getAttribute('data-' + key + '-html');
+      // Prefer keyed value; fall back to arr so elements missing ow/gf attrs
+      // degrade gracefully before Stage 2 copy attributes are added.
+      const html = el.getAttribute('data-' + key + '-html') ?? el.getAttribute('data-arr-html');
       if (html != null) {
         el.innerHTML = html;
       } else {
-        const txt = el.getAttribute('data-' + key);
+        const txt = el.getAttribute('data-' + key) ?? el.getAttribute('data-arr');
         if (txt != null) el.textContent = txt;
       }
-      const dt = el.getAttribute('data-' + key + '-text');
+      const dt = el.getAttribute('data-' + key + '-text') ?? el.getAttribute('data-arr-text');
       if (dt != null) el.setAttribute('data-text', dt);
-      const ph = el.getAttribute('data-' + key + '-placeholder');
+      const ph = el.getAttribute('data-' + key + '-placeholder') ?? el.getAttribute('data-arr-placeholder');
       if (ph != null) el.setAttribute('placeholder', ph);
     });
   }
@@ -703,15 +770,25 @@
         b.addEventListener('click', () => {
           const v = b.dataset.val;
           state[key] = v;
+          // When the user picks a new world via the Tweaks panel, also
+          // snap to that world's default accent so swatches make sense.
+          if (key === 'theme') {
+            state.accent = DEFAULT_ACCENT_FOR_THEME[v] || 'crimson';
+          }
           saveState(state);
-          if (key === 'theme') applyTheme(v);
+          if (key === 'theme') {
+            applyTheme(v);
+            applyAccent(state.accent);
+            // Refresh accent active-state after the theme swap.
+            panel.querySelectorAll('[data-accent]').forEach((x) => x.classList.toggle('active', x.dataset.accent === state.accent));
+          }
           if (key === 'density') applyDensity(v);
           paintSeg(`[data-seg="${key}"]`, v);
         });
       });
     });
 
-    // Accent swatches
+    // Accent swatches — applies whichever swatch is in the visible palette
     panel.querySelectorAll('[data-accent]').forEach((sw) => {
       sw.classList.toggle('active', sw.dataset.accent === state.accent);
       sw.addEventListener('click', () => {
@@ -721,6 +798,16 @@
         panel.querySelectorAll('[data-accent]').forEach((x) => x.classList.toggle('active', x.dataset.accent === state.accent));
       });
     });
+
+    // Repaint helper used by initWorldPicker — keeps active states in sync
+    // after a theme change triggered outside the Tweaks panel.
+    paintTweaks = () => {
+      paintSeg('[data-seg="theme"]', state.theme);
+      paintSeg('[data-seg="density"]', state.density);
+      panel.querySelectorAll('[data-accent]').forEach((x) => {
+        x.classList.toggle('active', x.dataset.accent === state.accent);
+      });
+    };
 
     // Glitch slider
     const slider = panel.querySelector('#glitchSlider');
@@ -735,24 +822,34 @@
   }
 
   // -----------------------------------------------------------------
-  // Night-City toggle button
+  // 4-way world picker — any of 4 worlds, selectable at any time
   // -----------------------------------------------------------------
-  function initNCToggle() {
-    const btn = document.getElementById('ncToggle');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      // Capture the viewport anchor BEFORE the theme swap so we can
-      // restore scroll position relative to the section the user is
-      // currently looking at. Copy-swap can reflow the hero and bio
-      // headlines to different heights, which would otherwise jerk
-      // the page up or down by 40-100px on every toggle.
-      const anchor = findScrollAnchor();
-      state.theme = state.theme === 'night-city' ? 'arrakis' : 'night-city';
-      saveState(state);
-      applyTheme(state.theme);
-      restoreScrollAnchor(anchor);
+  function initWorldPicker() {
+    const buttons = document.querySelectorAll('.world-picker .world-btn');
+    if (!buttons.length) return;
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = btn.dataset.world;
+        if (!next || next === state.theme) return;
+        // Capture viewport scroll anchor BEFORE the swap so copy-swap reflow
+        // (which can shift hero/bio heights across themes) doesn't jerk scroll.
+        const anchor = findScrollAnchor();
+        state.theme = next;
+        // Reset to the new theme's default accent so a stale accent from
+        // the previous world never writes to the wrong CSS custom properties.
+        state.accent = DEFAULT_ACCENT_FOR_THEME[next] || 'crimson';
+        saveState(state);
+        applyTheme(state.theme);
+        applyAccent(state.accent);
+        paintTweaks();
+        restoreScrollAnchor(anchor);
+      });
     });
   }
+
+  // Stub populated by initTweaks; called by initWorldPicker to keep the
+  // Tweaks panel active-states in sync after an external world switch.
+  let paintTweaks = () => {};
 
   // Pick whichever .page-section currently intersects the viewport,
   // and record how far its top sits from the top of the viewport.
@@ -786,6 +883,85 @@
   }
 
   // -----------------------------------------------------------------
+  // Entry screen — first-load world picker
+  // -----------------------------------------------------------------
+  function initEntryScreen() {
+    const screen = document.getElementById('entryScreen');
+    if (!screen) return;
+    const ENTRY_KEY = 'danimemes.entered.v2';
+
+    // Fade out, then remove from paint/interaction after the CSS transition.
+    // 600 ms matches the entry-screen opacity transition in styles.css.
+    function close() {
+      screen.classList.add('entry-hidden');
+      screen.setAttribute('aria-hidden', 'true');
+      try { sessionStorage.setItem(ENTRY_KEY, '1'); } catch (_) {}
+      // Only set display:none AFTER the fade completes so the opacity
+      // transition is visible (Learnings #16).
+      setTimeout(() => { screen.style.display = 'none'; }, 600);
+    }
+
+    // Restore the screen: clear display:none first, force a reflow with
+    // void offsetWidth so the browser re-registers the start state, THEN
+    // remove entry-hidden so the fade-in transition replays (Learnings #16).
+    function open() {
+      screen.style.display = '';
+      // Reflow must happen between removing display:none and removing the
+      // hidden class, otherwise the browser skips the transition.
+      void screen.offsetWidth;
+      screen.classList.remove('entry-hidden');
+      screen.setAttribute('aria-hidden', 'false');
+    }
+
+    // Session gate: if the user has already picked a world this session,
+    // suppress the overlay instantly (no fade — it was never visible).
+    let entered = false;
+    try { entered = sessionStorage.getItem(ENTRY_KEY) === '1'; } catch (_) {}
+    if (entered) {
+      screen.classList.add('entry-hidden');
+      screen.style.display = 'none';
+      screen.setAttribute('aria-hidden', 'true');
+    }
+
+    // Card clicks — set world + accent, save, apply, then fade out.
+    screen.querySelectorAll('.entry-card').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = btn.dataset.world;
+        if (next && next !== state.theme) {
+          state.theme  = next;
+          state.accent = DEFAULT_ACCENT_FOR_THEME[next] || 'crimson';
+          saveState(state);
+          applyTheme(state.theme);
+          applyAccent(state.accent);
+          paintTweaks();
+        }
+        close();
+      });
+    });
+
+    // SKIP — dismiss without changing the current world.
+    const skip = screen.querySelector('.entry-skip');
+    if (skip) skip.addEventListener('click', close);
+
+    // Esc key — same as SKIP; only acts when the screen is actually visible.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !screen.classList.contains('entry-hidden')) close();
+    });
+
+    // Footer "↻ CHANGE WORLD" link — re-show the overlay.
+    // Note: we clear the session flag on manual reopen so that if the user
+    // picks a card the close() path re-sets the flag correctly.
+    const reopen = document.getElementById('reopenEntry');
+    if (reopen) {
+      reopen.addEventListener('click', (e) => {
+        e.preventDefault();
+        try { sessionStorage.removeItem(ENTRY_KEY); } catch (_) {}
+        open();
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------
   // Boot
   // -----------------------------------------------------------------
   function boot() {
@@ -795,7 +971,8 @@
     initAccordion();
     initChat();
     initTweaks();
-    initNCToggle();
+    initWorldPicker();
+    initEntryScreen();
     // Start hiding df-messenger chrome as early as possible.
     // This runs in parallel with initChat's openChat call; the
     // re-injection timeouts inside scheduleDfHide + hideDfMessengerChrome
