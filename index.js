@@ -1013,16 +1013,8 @@
   // -----------------------------------------------------------------
   // Easter egg — FIFTH REALM portal
   //
-  // TRIGGER: 7 rapid clicks on .med-frame (the circular Dan portrait inside
-  //          .entry-medallion). "Rapid" = each click must arrive within 600 ms
-  //          of the previous one; a longer gap resets the counter to 0.
-  //
-  // WHY .med-frame and NOT .entry-medallion:
-  //   .entry-medallion has pointer-events:none so its presence doesn't
-  //   interfere with the card hover / rotation effects driven by
-  //   .entry-grid:has(.e-arr:hover) etc. Only .med-frame gets
-  //   pointer-events:auto + cursor:pointer (set in styles.css), confining
-  //   the clickable area to the small center circle.
+  // TRIGGER: press and hold the center medallion for ~1.1s; a circular
+  //          loading ring fills around it. Releasing early cancels.
   //
   // PORTAL: full-screen overlay, z-index 10000 (above entry-screen 9999).
   //   Colors auto-adapt via var(--bg) / var(--fg) — no per-world rules needed.
@@ -1033,18 +1025,14 @@
   function initEasterEgg() {
     const portal    = document.getElementById('fifthRealmPortal');
     const medallion = document.querySelector('#entryScreen .entry-medallion');
-    const medFrame  = document.querySelector('#entryScreen .med-frame');
     if (!portal || !medallion) return;
 
     const closeBtn  = portal.querySelector('.frp-close');
     const backdrop  = portal.querySelector('.frp-backdrop');
 
-    // --- Click-counter state ---
-    const CLICKS_NEEDED  = 7;
-    const RAPID_MS       = 600;   // max gap between successive rapid clicks
-    let   clickCount     = 0;
-    let   lastClickTime  = 0;
-    let   pulseTimer     = null;  // used to remove the pulse class after each click
+    // --- Hold-gesture state ---
+    const HOLD_MS = 6000; // must match the CSS ring transition duration
+    let holdTimer = null;
 
     // --- Focus restoration ---
     // Remember which element had focus before the portal opened so we can
@@ -1076,69 +1064,39 @@
     }
 
     // ------------------------------------------------------------------
-    // Click-pulse feedback on .med-frame
-    // Adds the CSS class that triggers a brief scale-bump animation, then
-    // removes it so the animation can replay on the next click.
+    // Press-and-hold handlers (Pointer Events — unifies mouse + touch)
     // ------------------------------------------------------------------
-    function triggerMedPulse() {
-      if (reducedMotion || !medFrame) return; // honour user preference; pulse needs the frame
-      if (pulseTimer !== null) {
-        // Clear any lingering timer so overlapping rapid clicks don't
-        // stack up class-removal callbacks.
-        clearTimeout(pulseTimer);
-        medFrame.classList.remove('med-frame-pulse');
-        // Force a reflow between remove and re-add so the animation restarts
-        // even if a previous animation is still mid-way.
-        void medFrame.offsetWidth;
-      }
-      medFrame.classList.add('med-frame-pulse');
-      pulseTimer = setTimeout(() => {
-        medFrame.classList.remove('med-frame-pulse');
-        pulseTimer = null;
-      }, 250);
+
+    // Gate: returns true only when #entryScreen is present and visible.
+    function isEntryVisible() {
+      const screen = document.getElementById('entryScreen');
+      return !!screen && !screen.classList.contains('entry-hidden');
     }
 
-    // ------------------------------------------------------------------
-    // Click handler on the whole medallion (large hit target)
-    // ------------------------------------------------------------------
-    medallion.addEventListener('click', (e) => {
-      // Any click anywhere on the medallion (including its enlarged ::after
-      // pad) counts. We still gate on the entry screen being visible so the
-      // easter egg stays inactive while browsing the main page.
-      const screen = document.getElementById('entryScreen');
-      if (!screen || screen.classList.contains('entry-hidden')) {
-        // Entry screen not showing — easter egg is inactive while browsing
-        // the main page, so reset and bail.
-        clickCount    = 0;
-        lastClickTime = 0;
-        return;
-      }
+    function cancelHold() {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      medallion.classList.remove('is-holding');
+    }
 
-      const now = Date.now();
-      const gap = now - lastClickTime;
+    function startHold(e) {
+      if (!isEntryVisible()) return;
+      // Ignore non-primary mouse buttons (right-click, middle-click, etc.)
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // Suppress text/image selection and the touch long-press context menu.
+      e.preventDefault();
 
-      // Gap check: if more than RAPID_MS elapsed since the last click,
-      // this click starts a fresh sequence.
-      if (lastClickTime === 0 || gap > RAPID_MS) {
-        clickCount = 1;
-      } else {
-        clickCount++;
-      }
-      lastClickTime = now;
-
-      // Pulse feedback from click 2 onward so the user notices something
-      // is building (click 1 is indistinguishable from idle browsing).
-      if (clickCount > 1) {
-        triggerMedPulse();
-      }
-
-      // On the 7th rapid click, open the portal.
-      if (clickCount >= CLICKS_NEEDED) {
-        clickCount    = 0;
-        lastClickTime = 0;
+      medallion.classList.add('is-holding');
+      holdTimer = setTimeout(() => {
+        cancelHold(); // remove ring class before opening so it resets cleanly
         openPortal();
-      }
-    });
+      }, HOLD_MS);
+    }
+
+    medallion.addEventListener('pointerdown',  startHold);
+    medallion.addEventListener('pointerup',    cancelHold);
+    medallion.addEventListener('pointercancel', cancelHold);
+    medallion.addEventListener('pointerleave', cancelHold); // dragging off cancels
 
     // ------------------------------------------------------------------
     // Close affordances

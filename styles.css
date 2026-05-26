@@ -2347,19 +2347,258 @@ body.night-city df-messenger {
    set per body class by the world theme engine in index.js.
    ================================================================ */
 
-/* ---- Click-pulse feedback on .med-frame (counts 1–6) ---- */
-/* The JS adds/removes .med-frame-pulse on each valid rapid click so
-   the user senses something happening around clicks 3–4. */
-@keyframes med-pulse {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.07); }
-  100% { transform: scale(1); }
+/* ---- Press-and-hold progress ring (easter egg) ---- */
+.med-progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  transform: rotate(-90deg);        /* start fill at 12 o'clock */
+  overflow: visible;
 }
-.med-frame.med-frame-pulse {
-  animation: med-pulse 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.med-progress circle {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
+.med-progress-track {
+  /* No groove — this is a line drawn by the sling rotation, not a loading bar. */
+  stroke: transparent;
+}
+.med-progress-fill {
+  /* A clean solid line drawn by the sling rotation (the comet .med-draw rides
+     its leading edge). Closes into a full solid ring exactly at completion. */
+  stroke: #ffe2a8;                  /* bright gold line */
+  stroke-width: 4.6;                /* bold, strong outline */
+  stroke-linecap: round;
+  stroke-dasharray: 301.6;          /* 2*pi*48 */
+  stroke-dashoffset: 301.6;         /* fully empty */
+  /* Fast drain on release (base/idle transition) */
+  transition: stroke-dashoffset 320ms ease, opacity 280ms ease;
+  opacity: 0;                       /* invisible until a hold starts */
+  filter: drop-shadow(0 0 6px rgba(255, 210, 130, 1))
+          drop-shadow(0 0 16px rgba(255, 140, 30, 0.7));
+}
+.entry-medallion.is-holding .med-progress-fill {
+  stroke-dashoffset: 0;             /* full */
+  opacity: 1;
+  /* Slow draw AND gradual opacity fade-in over the hold; release uses the
+     fast base transitions above for a quick drain + fade-out. */
+  transition: stroke-dashoffset 6000ms linear, opacity 6000ms linear;
+}
+
+/* ---- Comet head — the white-hot point drawing the portal ring ----
+   A wrapper that rotates 0->360deg over the 6s hold (linear), carrying a
+   single glowing ember at 12 o'clock. Because it shares the same is-holding
+   trigger, the same 6000ms duration, and the same linear timing as the fill,
+   the ember stays pinned to the fill's leading edge — the bar becomes the
+   business end of the portal rather than a separate UI element. */
+.med-draw {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;                       /* brightest point — above ring + sparks */
+  transform-origin: center center;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.entry-medallion.is-holding .med-draw {
+  opacity: 1;
+  transition: opacity 6000ms linear;   /* gradual fade-in over the hold */
+  animation: mpf-draw 6000ms linear forwards;
+}
+/* Zero-width stick anchored at centre, reaching the ring radius (48% of box) */
+.med-draw b {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 0;
+  height: 48%;
+  transform-origin: bottom center;
+  transform: translateX(-50%);
+}
+/* The ember itself, riding the stick tip on the ring */
+.med-draw b::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #fff6e0 22%, #ffae34 52%, transparent 76%);
+  box-shadow: 0 0 10px 4px rgba(255, 205, 100, 1),
+              0 0 24px 9px rgba(255, 120, 0, 0.8),
+              0 0 44px 16px rgba(255, 90, 0, 0.45);
+  animation: mpf-flicker 0.5s ease-in-out infinite alternate;
+}
+@keyframes mpf-draw {
+  /* Clockwise — an SVG <circle> draws clockwise from its start point, and the
+     ring is rotated -90deg so the fill starts at 12 o'clock and grows
+     clockwise. The ember matches that so it stays pinned to the fill's tip. */
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ---- D20 glyph — emerges over Dan in the final stretch of the hold ----
+   Hidden for the first ~60% of the fill, then fades + scales + spins into
+   place as the portal nears completion (the realm revealing itself). */
+.med-d20 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Match the hover world-symbols exactly: .med-orns is 92% of .med-frame,
+     and .med-frame is the medallion minus 22px. Reproduce that box here so
+     the d20 lands at the same size and centre as the hover icons. */
+  width:  calc((100% - 22px) * 0.92);
+  height: calc((100% - 22px) * 0.92);
+  transform: translate(-50%, -50%) scale(0.45);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;                       /* over Dan + ring + sparks */
+  color: #ffd884;                   /* warm gold; SVG strokes use currentColor */
+  filter: drop-shadow(0 0 8px rgba(255, 170, 50, 0.95))
+          drop-shadow(0 0 20px rgba(255, 100, 0, 0.6));
+}
+.entry-medallion.is-holding .med-d20 {
+  animation: mpf-d20 6000ms linear forwards;
+}
+@keyframes mpf-d20 {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.45) rotate(-70deg); }
+  60%  { opacity: 0;   transform: translate(-50%, -50%) scale(0.60) rotate(-50deg); }
+  80%  { opacity: 0.6; transform: translate(-50%, -50%) scale(0.95) rotate(-14deg); }
+  92%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.06) rotate(2deg); }
+  100% { opacity: 1;   transform: translate(-50%, -50%) scale(1.00) rotate(0deg); } /* == hover icon size */
+}
+
+/* Reduced motion: no fill sweep, no travelling comet, no d20 spin-in
+   (they can't track a transition we don't run); the JS timer still opens
+   the portal. */
 @media (prefers-reduced-motion: reduce) {
-  .med-frame.med-frame-pulse { animation: none !important; }
+  .med-progress-fill { transition: opacity 150ms ease; }
+  .med-draw { display: none; }
+  .med-d20  { display: none; }
+}
+
+/* ---- Doctor Strange sanctum-portal FX (press-and-hold easter egg) ---- */
+
+/* Container — sits over the medallion rim, hidden at rest */
+.med-portal-fx {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+
+/* Activate while holding — opacity fades in gradually across the whole 6s
+   hold (fast fade-out on release uses the 350ms base transition above). The
+   brightness crescendo layers on top via mpf-build. */
+.entry-medallion.is-holding .med-portal-fx {
+  opacity: 1;
+  transition: opacity 6000ms linear;
+  animation: mpf-build 6000ms linear forwards;
+}
+
+
+/* ---- Spark ring ---- */
+.mpf-sparks {
+  position: absolute;
+  inset: 0;
+  animation: mpf-spin 3s linear infinite;   /* idle (not holding) — invisible anyway */
+}
+/* While holding, the sling makes exactly ONE rotation over the 6s, locked
+   (linear) to the line being drawn so the embers trace it and the ring closes
+   into a solid line exactly at completion. */
+.entry-medallion.is-holding .mpf-sparks {
+  animation: mpf-orbit 6000ms linear forwards;
+}
+
+/* Each spark is a zero-width "stick" anchored at the medallion centre and
+   rotated to its angle (placement only — no animation here, so the orbit
+   from .mpf-sparks and the flicker on ::before never fight over `transform`).
+   Stick length = 48% of the medallion box ≈ the rim, so the ring of embers
+   sits just inside the medallion (it scales responsively). */
+.mpf-sparks i {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;                /* the stick's base sits exactly at centre */
+  width: 0;
+  height: 48%;                /* reach to the rim — ring sits inside */
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(calc(var(--i) * 9deg));   /* 40 sparks × 9° = 360° */
+}
+/* The visible glowing ember rides the top of the stick and flickers on its
+   own transform, independent of the stick's placement. */
+.mpf-sparks i::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;      /* centre the dot on the stick tip */
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #fff6e0 28%, #ffd27a 56%, #ffae34 72%, transparent 84%);
+  box-shadow: 0 0 10px 3px rgba(255, 190, 70, 1),
+              0 0 22px 7px rgba(255, 120, 0, 0.85),
+              0 0 38px 12px rgba(255, 80, 0, 0.5);
+  animation: mpf-flicker calc(0.7s + var(--i) * 0.03s) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.13s);
+}
+
+/* ---- Keyframes ---- */
+
+/* Spin (shared by arcs and the idle spark ring) */
+@keyframes mpf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* One full rotation while holding — the sling sweeps the circle once and
+   closes the drawn line into a solid ring exactly at completion. */
+@keyframes mpf-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Spark flicker — opacity + scale only (runs on ::before, centred via margin,
+   so a bare scale() keeps the ember centred on the stick tip). */
+@keyframes mpf-flicker {
+  0%   { opacity: 0.30; transform: scale(0.6); }
+  100% { opacity: 1.00; transform: scale(1.4); }
+}
+
+/* Portal build — the whole FX crescendos as the bar fills: starts dim + small,
+   then ramps hard (brightness + saturation + scale) toward completion so the
+   portal visibly intensifies the closer the hold gets to opening. */
+/* Intensity only — no scale, so the spark ring stays pinned to the medallion
+   (scaling the container used to expand the ring's radius = sparks drifting). */
+@keyframes mpf-build {
+  0%   { filter: brightness(0.45) saturate(0.80); }
+  25%  { filter: brightness(0.65) saturate(0.95); }
+  50%  { filter: brightness(0.95) saturate(1.10); }
+  75%  { filter: brightness(1.35) saturate(1.30); }
+  90%  { filter: brightness(1.70) saturate(1.50); }
+  100% { filter: brightness(2.00) saturate(1.65); }
+}
+
+/* Reduced motion: kill all portal FX animations, keep a faint static glow */
+@media (prefers-reduced-motion: reduce) {
+  .med-portal-fx,
+  .mpf-sparks,
+  .mpf-sparks i,
+  .mpf-sparks i::before {
+    animation: none !important;
+  }
+  .entry-medallion.is-holding .med-portal-fx {
+    opacity: 0.35;
+    filter: brightness(1);
+  }
 }
 
 /* ---- Portal overlay ---- */

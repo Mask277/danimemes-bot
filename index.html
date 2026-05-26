@@ -34,6 +34,32 @@
       <!-- Center medallion — the subject himself, holding the worlds together -->
       <div class="entry-medallion" aria-hidden="true">
         <div class="med-ring"></div>
+        <!-- Press-and-hold progress ring (easter egg). Fills over 1.1s while
+             .entry-medallion.is-holding is present; drains on release. -->
+        <svg class="med-progress" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="med-progress-track" cx="50" cy="50" r="48" />
+          <circle class="med-progress-fill"  cx="50" cy="50" r="48" />
+        </svg>
+        <!-- Doctor Strange sanctum-portal FX — active only while .is-holding.
+             Pure CSS, pointer-events:none, sits over the medallion rim. -->
+        <div class="med-portal-fx" aria-hidden="true">
+          <div class="mpf-sparks">
+            <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
+            <i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i>
+            <i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i>
+            <i style="--i:12"></i><i style="--i:13"></i><i style="--i:14"></i><i style="--i:15"></i>
+            <i style="--i:16"></i><i style="--i:17"></i><i style="--i:18"></i><i style="--i:19"></i>
+            <i style="--i:20"></i><i style="--i:21"></i><i style="--i:22"></i><i style="--i:23"></i>
+            <i style="--i:24"></i><i style="--i:25"></i><i style="--i:26"></i><i style="--i:27"></i>
+            <i style="--i:28"></i><i style="--i:29"></i><i style="--i:30"></i><i style="--i:31"></i>
+            <i style="--i:32"></i><i style="--i:33"></i><i style="--i:34"></i><i style="--i:35"></i>
+            <i style="--i:36"></i><i style="--i:37"></i><i style="--i:38"></i><i style="--i:39"></i>
+          </div>
+        </div>
+        <!-- Comet head — the white-hot point that draws the portal ring.
+             Rotates 0->360deg over the 6s hold (linear), locked to the
+             leading edge of .med-progress-fill so the fill IS the portal. -->
+        <div class="med-draw" aria-hidden="true"><b></b></div>
         <div class="med-frame">
           <img src="image/FixedDan.png" alt="" />
 
@@ -88,6 +114,19 @@
             </svg>
           </div>
         </div>
+        <!-- D20 glyph — materialises over Dan in the last stretch of the hold,
+             as the portal nears completion. Same icosahedron as .frp-d20. -->
+        <svg class="med-d20" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <polygon points="50,6 94,32 94,68 50,94 6,68 6,32" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.85"/>
+          <polygon points="50,6 94,32 6,32" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.6"/>
+          <polygon points="50,94 94,68 6,68" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.6"/>
+          <line x1="6"  y1="32" x2="50" y2="50" stroke="currentColor" stroke-width="1.1" opacity="0.5"/>
+          <line x1="94" y1="32" x2="50" y2="50" stroke="currentColor" stroke-width="1.1" opacity="0.5"/>
+          <line x1="6"  y1="68" x2="50" y2="50" stroke="currentColor" stroke-width="1.1" opacity="0.5"/>
+          <line x1="94" y1="68" x2="50" y2="50" stroke="currentColor" stroke-width="1.1" opacity="0.5"/>
+          <line x1="50" y1="6"  x2="50" y2="50" stroke="currentColor" stroke-width="1.1" opacity="0.5"/>
+          <text x="50" y="56" text-anchor="middle" font-family="Anton, sans-serif" font-size="18" fill="currentColor" opacity="0.95">20</text>
+        </svg>
         <div class="med-label">
           <span class="med-label-top">— THE SUBJECT —</span>
           <span class="med-label-mid">DANIEL</span>
@@ -235,7 +274,7 @@
 
   <!-- ============================================================
        EASTER EGG — FIFTH REALM PORTAL
-       Hidden by default. Revealed by 7 rapid clicks on .med-frame.
+       Hidden by default. Revealed by pressing and holding the center medallion (~1.1s).
        JS: initEasterEgg() in index.js
        ============================================================ -->
   <div id="fifthRealmPortal"
