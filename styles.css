@@ -54,7 +54,12 @@ html, body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* Legacy Edge / IE */
 }
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar { display: none; } /* Chrome / Safari / Edge (Blink/WebKit) */
 
 /* Subtle dune-ripple paper grain — applied to sand sections.
    Soft warm noise + faint horizontal wave so cream feels like sand. */
@@ -1397,12 +1402,13 @@ body.oldworld .subtitle {
   letter-spacing: 0.005em;
   font-style: italic;
 }
-/* IM Fell English SC + Cinzel render WIDER than Anton at the same px size,
-   so headlines wrap to 2 lines in OW. Shrink display sizes per-theme to keep
-   wrap-count consistent — per STYLING_LEARNINGS.md #7. */
+/* Sized for VISUAL parity with the base Anton hero, not px parity. Cormorant/IM
+   Fell SC render wider & taller per glyph than Anton, so an equal px size looks
+   bigger AND wraps "DANIEL, KIN" to 2 lines. ~84% of the base max keeps it
+   single-line and optically matched to ARR/NC. Per STYLING_LEARNINGS.md #7. */
 body.oldworld .headline-hero {
   letter-spacing: 0; line-height: 1.0;
-  font-size: clamp(40px, 9vw, 132px);
+  font-size: clamp(44px, 10vw, 152px);
 }
 body.oldworld .bio-headline {
   font-size: clamp(22px, 3vw, 40px);
@@ -1544,10 +1550,15 @@ body.grimfuture .tweaks-row .seg button {
   font-weight: 700;
   letter-spacing: 0.04em;
 }
+/* Visual parity with base Anton hero (not px parity): Cinzel @900 is much wider
+   & heavier than Anton, and the inline-block "SIS" + dagger ornament wrap as a
+   unit — measured single-line threshold is ~140px, so cap at 138px. The heavier
+   weight keeps optical mass on par with the larger Anton/OW heroes.
+   Per STYLING_LEARNINGS.md #7. */
 body.grimfuture .headline-hero {
   font-weight: 900;
   letter-spacing: 0.02em;
-  font-size: clamp(40px, 9.5vw, 140px);
+  font-size: clamp(46px, 9.5vw, 138px);
 }
 body.grimfuture .bio-headline {
   font-size: clamp(22px, 3vw, 40px);

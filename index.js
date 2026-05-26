@@ -127,6 +127,9 @@
 
     // Copy swap — every element tagged data-arr/data-nc/data-ow/data-gf updates.
     applyCopy(t);
+
+    // Re-point the seeded chat greeting to the new world.
+    refreshChatGreeting();
   }
 
   function applyCopy(theme) {
@@ -152,6 +155,39 @@
       const ph = el.getAttribute('data-' + key + '-placeholder') ?? el.getAttribute('data-arr-placeholder');
       if (ph != null) el.setAttribute('placeholder', ph);
     });
+  }
+
+  // World-aware chat system lines (greeting + error states), keyed to the
+  // active world so the bot doesn't always speak Dune.
+  const CHAT_LINES = {
+    arr: {
+      greeting:    'Bi-la kaifa. Type a message or pick a chip — the oracle is listening.',
+      silent:      '[No response — the oracle is silent. Try again.]',
+      unreachable: '[Oracle unreachable — the widget hasn\'t initialised yet. Try again in a moment.]',
+    },
+    nc: {
+      greeting:    'Wake up, choomba. Type a message or pick a chip — the netrunner\'s jacked in.',
+      silent:      '[No carrier — the netrunner flatlined. Ping again.]',
+      unreachable: '[Connection refused — the net isn\'t up yet. Try again in a moment.]',
+    },
+    ow: {
+      greeting:    'Speak, then. Send a message or choose a chip — the shadow-kin is listening.',
+      silent:      '[Silence from the shadow — no reply returns. Try again.]',
+      unreachable: '[The shadow keeps his counsel — the link isn\'t drawn yet. Try again in a moment.]',
+    },
+    gf: {
+      greeting:    'Vox-link open. Speak a message or choose a chip — the Sister attends.',
+      silent:      '[No vox returns — the Sister is at prayer. Recite again.]',
+      unreachable: '[Vox-link severed — the rite isn\'t complete yet. Try again in a moment.]',
+    },
+  };
+  const chatLine = (name) => (CHAT_LINES[THEME_KEY[state.theme]] || CHAT_LINES.arr)[name];
+
+  // Re-point the seeded greeting bubble to the active world's greeting.
+  // No-op until initChat() has rendered the greeting.
+  function refreshChatGreeting() {
+    const el = document.querySelector('#chatLog .msg-greeting .msg-body');
+    if (el) el.textContent = chatLine('greeting');
   }
 
   // Initial paint of persisted state
@@ -530,8 +566,9 @@
 
     if (!log) return;
 
-    // Initial greeting bubble
-    appendMsg(log, 'bot', 'Bi-la kaifa. Type a message or pick a chip — the oracle is listening.');
+    // Initial greeting bubble — reflects the active world; tagged so it can be
+    // re-pointed on world switch via refreshChatGreeting().
+    appendMsg(log, 'bot', chatLine('greeting')).classList.add('msg-greeting');
 
     if (!input || !send) return;
 
@@ -669,7 +706,7 @@
             log.removeChild(typingIndicator);
             typingIndicator = null;
           }
-          appendMsg(log, 'bot', '[No response — the oracle is silent. Try again.]');
+          appendMsg(log, 'bot', chatLine('silent'));
         }
       }, 400);
     }
@@ -709,7 +746,7 @@
           log.removeChild(typingIndicator);
           typingIndicator = null;
         }
-        appendMsg(log, 'bot', '[Oracle unreachable — the widget hasn\'t initialised yet. Try again in a moment.]');
+        appendMsg(log, 'bot', chatLine('unreachable'));
         return;
       }
 
@@ -911,6 +948,12 @@
       void screen.offsetWidth;
       screen.classList.remove('entry-hidden');
       screen.setAttribute('aria-hidden', 'false');
+      // Reset scroll to the top so dismissing into the chosen world lands at
+      // the hero, not wherever the footer link was clicked. Deferred to the
+      // next frame: showing the fixed overlay triggers a scroll-anchoring pass
+      // that otherwise re-nudges the page ~1 nav-height down. Hidden behind the
+      // overlay, so there's no visible jump.
+      requestAnimationFrame(() => window.scrollTo(0, 0));
     }
 
     // Session gate: if the user has already picked a world this session,
