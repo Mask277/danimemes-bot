@@ -101,18 +101,84 @@
         <a href="#about" class="btn"
            data-arr="READ THE DOSSIER" data-nc="READ THE SPECSHEET"
            data-ow="READ THE DARK LEDGER" data-gf="READ THE WAR-PSALM">READ THE DOSSIER</a>
-        <svg class="worm-ring" viewBox="0 0 100 100" aria-hidden="true">
-          <circle cx="50" cy="50" r="46"/>
-          <circle cx="50" cy="50" r="34"/>
-          <circle cx="50" cy="50" r="22"/>
-          <circle cx="50" cy="50" r="10"/>
-          <g class="dots">
-            <circle cx="50" cy="4"  r="1.4"/>
-            <circle cx="96" cy="50" r="1.4"/>
-            <circle cx="50" cy="96" r="1.4"/>
-            <circle cx="4"  cy="50" r="1.4"/>
-          </g>
-        </svg>
+        <span class="hero-ornament" aria-hidden="true">
+          <svg class="worm-ring orn orn-arr" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46"/>
+            <circle cx="50" cy="50" r="34"/>
+            <circle cx="50" cy="50" r="22"/>
+            <circle cx="50" cy="50" r="10"/>
+            <g class="dots">
+              <circle cx="50" cy="4"  r="1.4"/>
+              <circle cx="96" cy="50" r="1.4"/>
+              <circle cx="50" cy="96" r="1.4"/>
+              <circle cx="4"  cy="50" r="1.4"/>
+            </g>
+          </svg>
+
+          <!-- Night City: target reticle -->
+          <svg class="orn orn-nc" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="1"/>
+            <path d="M50 6 V30 M50 70 V94 M6 50 H30 M70 50 H94" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="46" y="46" width="8" height="8" fill="currentColor"/>
+            <path d="M16 16 L34 34 M84 16 L66 34 M16 84 L34 66 M84 84 L66 66" stroke="currentColor" stroke-width="1" fill="none" opacity="0.6"/>
+          </svg>
+
+          <!-- Old World (Dark Elf): thorned crown / obsidian dagger -->
+          <svg class="orn orn-ow" viewBox="0 0 100 100">
+            <!-- Outer circular frame -->
+            <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1"/>
+            <!-- Downward-pointing obsidian dagger -->
+            <g fill="currentColor">
+              <!-- Pommel/grip -->
+              <rect x="47" y="18" width="6" height="4"/>
+              <rect x="45" y="22" width="10" height="3"/>
+              <rect x="46" y="25" width="8" height="10"/>
+              <!-- Crossguard with curved horns -->
+              <path d="M30 35 Q34 32 38 35 L62 35 Q66 32 70 35 L66 38 L34 38 Z"/>
+              <!-- Blade tapering to point -->
+              <path d="M44 38 L56 38 L52 82 L50 86 L48 82 Z"/>
+            </g>
+            <!-- Blood drops below the tip -->
+            <g fill="currentColor">
+              <circle cx="50" cy="90" r="1.6" opacity="0.7"/>
+              <circle cx="44" cy="94" r="1.2" opacity="0.5"/>
+              <circle cx="56" cy="94" r="1.2" opacity="0.5"/>
+            </g>
+            <!-- Twin moons (top corners) -->
+            <g fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 18 Q17 14 21 18 Q19 22 14 18 Z" fill="currentColor" opacity="0.6"/>
+              <path d="M86 18 Q83 14 79 18 Q81 22 86 18 Z" fill="currentColor" opacity="0.6"/>
+            </g>
+          </svg>
+
+          <!-- Grim Future (Sororitas-coded): chalice with flame above -->
+          <svg class="orn orn-gf" viewBox="0 0 100 100">
+            <!-- Flame above the chalice -->
+            <g fill="currentColor">
+              <path d="M50 8 Q44 18 46 26 Q48 22 50 22 Q52 22 54 26 Q56 18 50 8 Z"/>
+              <path d="M50 14 Q47 22 50 28 Q53 22 50 14 Z" opacity="0.6"/>
+            </g>
+            <!-- Chalice cup -->
+            <g fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M34 32 L66 32 Q66 48 50 56 Q34 48 34 32 Z" fill="currentColor" fill-opacity="0.15"/>
+              <!-- Cup rim -->
+              <line x1="32" y1="32" x2="68" y2="32"/>
+              <!-- Stem -->
+              <line x1="50" y1="56" x2="50" y2="72"/>
+              <!-- Base -->
+              <path d="M36 78 L64 78 L62 72 L38 72 Z" fill="currentColor" fill-opacity="0.15"/>
+            </g>
+            <!-- Outer halo circle -->
+            <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1"/>
+            <!-- Inner sanctity dot ring (4 cardinals) -->
+            <g fill="currentColor">
+              <circle cx="50" cy="4"  r="1.4"/>
+              <circle cx="96" cy="50" r="1.4"/>
+              <circle cx="50" cy="96" r="1.4"/>
+              <circle cx="4"  cy="50" r="1.4"/>
+            </g>
+          </svg>
+        </span>
       </div>
     </div>
 
