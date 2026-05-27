@@ -1086,6 +1086,11 @@
       // Suppress text/image selection and the touch long-press context menu.
       e.preventDefault();
 
+      // Capture the pointer so minor finger drift during the long hold keeps
+      // delivering events to the medallion instead of firing pointerleave
+      // (which cancels). Releasing still fires pointerup → cancelHold.
+      try { medallion.setPointerCapture(e.pointerId); } catch (_) {}
+
       medallion.classList.add('is-holding');
       holdTimer = setTimeout(() => {
         cancelHold(); // remove ring class before opening so it resets cleanly

@@ -1811,6 +1811,15 @@ body.grimfuture df-messenger {
      disc, but card hovers everywhere else are unaffected. */
   pointer-events: auto;
   cursor: pointer;
+  /* Mobile press-and-hold hardening. Without these, a long-press on the
+     medallion highlights the label text / pops the iOS save-image callout,
+     and — critically — the browser treats the hold as the start of a scroll
+     and fires pointercancel, aborting the 6s hold before the portal opens. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
   display: grid;
   place-items: center;
   transition: transform .55s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1877,6 +1886,12 @@ body.grimfuture df-messenger {
   transform-origin: 50% 50%;
   transform: translateY(-14%) rotate(0deg);
   transition: transform .6s cubic-bezier(0.4, 0, 0.2, 1);
+  /* The hit target is .entry-medallion; the portrait must not intercept the
+     touch or offer its own drag/select/long-press-save affordances. */
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 /* Compass-needle rotation toward each corner. */
 .entry-grid:has(.e-arr:hover) .med-frame img { transform: translateY(-14%) rotate(-45deg); }
