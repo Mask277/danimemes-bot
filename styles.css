@@ -1868,9 +1868,14 @@ body.grimfuture df-messenger {
   background: #000;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* the world-selection overlay itself never scrolls */
   opacity: 1;
   transition: opacity .55s ease, visibility .55s ease;
 }
+/* Lock page scroll while the world-selection overlay is visible, so the
+   content behind the fixed overlay can't be scrolled. Releases the moment
+   the screen is dismissed (.entry-hidden is added). */
+html:has(#entryScreen:not(.entry-hidden)) { overflow: hidden; }
 .entry-screen.entry-hidden {
   opacity: 0;
   visibility: hidden;
