@@ -752,7 +752,9 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
    Solid dark terminal box stays readable even when .acc-row:hover flips
    the row to yellow. */
 .nc-transmission {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   margin: 16px 0 2px;
   padding: 11px 14px;
   border-left: 3px solid var(--nc-cyan);
@@ -760,6 +762,23 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   box-shadow: inset 0 0 0 1px rgba(0, 230, 246, 0.30),
               0 0 22px rgba(0, 230, 246, 0.14);
 }
+/* Caller avatar — Fixer Ivan, framed like a video-call portrait. Pulses
+   while the call is ringing, goes steady once connected. */
+.nc-tx-avatar {
+  width: clamp(54px, 9vw, 72px);
+  height: clamp(54px, 9vw, 72px);
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--nc-cyan);
+  box-shadow: 0 0 0 2px #0a0a0a, 0 0 14px rgba(0, 230, 246, 0.55);
+  animation: nc-tx-avatar-ring 1.4s ease-in-out infinite;
+}
+.nc-transmission.is-connected .nc-tx-avatar {
+  animation: none;
+  box-shadow: 0 0 0 2px #0a0a0a, 0 0 10px rgba(0, 230, 246, 0.4);
+}
+.nc-tx-main { flex: 1; min-width: 0; }
 .nc-tx-head {
   display: flex;
   align-items: center;
@@ -846,8 +865,12 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
   100% { opacity: 1; clip-path: inset(0 0 0 0); }
 }
+@keyframes nc-tx-avatar-ring {
+  0%, 100% { box-shadow: 0 0 0 2px #0a0a0a, 0 0 14px rgba(0, 230, 246, 0.55); }
+  50%      { box-shadow: 0 0 0 2px #0a0a0a, 0 0 22px rgba(0, 230, 246, 0.9), 0 0 4px var(--nc-pink); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .nc-tx-dot, .nc-tx-accept, .nc-tx-connecting { animation: none; }
+  .nc-tx-dot, .nc-tx-accept, .nc-tx-connecting, .nc-tx-avatar { animation: none; }
   .nc-transmission.is-connected .nc-tx-body { animation: none; }
 }
 .acc-body .spacer { /* aligns under acc-num */ }
