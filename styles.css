@@ -778,7 +778,7 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   animation: none;
   box-shadow: 0 0 0 2px #0a0a0a, 0 0 10px rgba(0, 230, 246, 0.4);
 }
-.nc-tx-main { flex: 1; min-width: 0; }
+.nc-tx-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .nc-tx-head {
   display: flex;
   align-items: center;
@@ -872,6 +872,19 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
 @media (prefers-reduced-motion: reduce) {
   .nc-tx-dot, .nc-tx-accept, .nc-tx-connecting, .nc-tx-avatar { animation: none; }
   .nc-transmission.is-connected .nc-tx-body { animation: none; }
+}
+/* Small phones — the accordion body column gets narrow (~240px), so trim the
+   transmission's avatar / spacing and let the ring controls go full-width so
+   the ACCEPT button never gets pinched. The panel already fits without these;
+   this just keeps it comfortable rather than cramped. */
+@media (max-width: 560px) {
+  .nc-transmission { gap: 11px; padding: 10px 12px; }
+  .nc-tx-avatar { width: 48px; height: 48px; }
+  .nc-tx-head { letter-spacing: 0.1em; }
+  .nc-tx-ring { gap: 8px 10px; }
+  .nc-tx-caller { flex: 1 1 100%; }
+  .nc-tx-accept { padding: 6px 12px; letter-spacing: 0.1em; }
+  .nc-tx-body { font-size: 16px; }
 }
 .acc-body .spacer { /* aligns under acc-num */ }
 
