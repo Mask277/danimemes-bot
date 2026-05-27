@@ -1127,6 +1127,31 @@
   }
 
   // -----------------------------------------------------------------
+  // Night City easter egg — incoming "transmission" from Fixer Ivan
+  //
+  // The transmission markup is injected via data-nc-html (applyCopy) and
+  // is re-created every time the world switches to Night City, so we use a
+  // single delegated click listener rather than binding the button directly
+  // (which would be lost on the next copy-swap). Clicking ACCEPT runs a brief
+  // "establishing uplink" beat, then flips the panel to its connected state;
+  // the CSS reveals the payload. Re-entering Night City re-arms the call.
+  // -----------------------------------------------------------------
+  function initNcTransmission() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.nc-tx-accept');
+      if (!btn) return;
+      const panel = btn.closest('.nc-transmission');
+      if (!panel || panel.classList.contains('is-connecting') || panel.classList.contains('is-connected')) return;
+      panel.classList.add('is-connecting');
+      const delay = reducedMotion ? 0 : 650;
+      setTimeout(() => {
+        panel.classList.remove('is-connecting');
+        panel.classList.add('is-connected');
+      }, delay);
+    });
+  }
+
+  // -----------------------------------------------------------------
   // Boot
   // -----------------------------------------------------------------
   function boot() {
@@ -1139,6 +1164,7 @@
     initWorldPicker();
     initEntryScreen();
     initEasterEgg();
+    initNcTransmission();
     // Start hiding df-messenger chrome as early as possible.
     // This runs in parallel with initChat's openChat call; the
     // re-injection timeouts inside scheduleDfHide + hideDfMessengerChrome
