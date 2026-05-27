@@ -742,6 +742,52 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   text-transform: none;
   max-width: 60ch;
 }
+
+/* ── Night City easter egg: "transmission" from Fixer Ivan ───────────
+   Injected via data-nc-html on .acc-body-inner, so it only renders in
+   the Night City world. A small comms panel: solid dark terminal box
+   (stays readable even when .acc-row:hover flips the row to yellow),
+   cyan-framed, monospace header, glitch-tinted payload line. */
+.nc-transmission {
+  display: block;
+  margin: 16px 0 2px;
+  padding: 11px 14px;
+  border-left: 3px solid var(--nc-cyan);
+  background: #0a0a0a;
+  box-shadow: inset 0 0 0 1px rgba(0, 230, 246, 0.30),
+              0 0 22px rgba(0, 230, 246, 0.14);
+}
+.nc-tx-head {
+  display: block;
+  margin-bottom: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--nc-cyan);
+}
+.nc-tx-blink {
+  font-style: normal;
+  margin-left: 7px;
+  color: var(--nc-cyan);
+  animation: nc-tx-blink 1.1s steps(1, end) infinite;
+}
+.nc-tx-body {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(16px, 2.4vw, 20px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--nc-yellow);
+  text-shadow: 1.5px 0 var(--nc-pink), -1.5px 0 var(--nc-cyan);
+}
+@keyframes nc-tx-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.12; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nc-tx-blink { animation: none; }
+}
 .acc-body .spacer { /* aligns under acc-num */ }
 
 .acc-row.open .acc-body { grid-template-rows: 1fr; }
