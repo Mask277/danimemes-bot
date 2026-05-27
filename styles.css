@@ -743,11 +743,14 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   max-width: 60ch;
 }
 
-/* ── Night City easter egg: "transmission" from Fixer Ivan ───────────
+/* ── Night City easter egg: incoming "transmission" from Fixer Ivan ──
    Injected via data-nc-html on .acc-body-inner, so it only renders in
-   the Night City world. A small comms panel: solid dark terminal box
-   (stays readable even when .acc-row:hover flips the row to yellow),
-   cyan-framed, monospace header, glitch-tinted payload line. */
+   the Night City world. Behaves like an in-lore comms call: it lands
+   RINGING (caller line + ACCEPT button); accepting runs a brief
+   ESTABLISHING UPLINK beat, then reveals the payload. State is driven by
+   .is-connecting / .is-connected, toggled in index.js (initNcTransmission).
+   Solid dark terminal box stays readable even when .acc-row:hover flips
+   the row to yellow. */
 .nc-transmission {
   display: block;
   margin: 16px 0 2px;
@@ -758,22 +761,66 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
               0 0 22px rgba(0, 230, 246, 0.14);
 }
 .nc-tx-head {
-  display: block;
-  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--nc-cyan);
 }
-.nc-tx-blink {
-  font-style: normal;
-  margin-left: 7px;
+.nc-tx-dot {
+  width: 7px; height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--nc-cyan);
+  box-shadow: 0 0 6px var(--nc-cyan);
+  animation: nc-tx-blink 1s steps(1, end) infinite;
+}
+/* Ringing state (default) */
+.nc-tx-ring {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.nc-tx-caller {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: color-mix(in oklab, var(--nc-yellow) 78%, transparent);
+}
+.nc-tx-accept {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 16px;
+  color: var(--nc-bg);
+  background: var(--nc-cyan);
+  border: 1px solid var(--nc-cyan);
+  box-shadow: 3px 3px 0 var(--nc-pink);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  animation: nc-tx-pulse 1.4s ease-in-out infinite;
+}
+.nc-tx-accept:hover  { background: var(--nc-yellow); border-color: var(--nc-yellow); box-shadow: 3px 3px 0 var(--nc-cyan); }
+.nc-tx-accept:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--nc-pink); }
+.nc-tx-accept:focus-visible { outline: 2px solid var(--nc-yellow); outline-offset: 2px; }
+/* Connecting + connected payload (revealed by JS state classes) */
+.nc-tx-connecting {
+  display: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
   color: var(--nc-cyan);
-  animation: nc-tx-blink 1.1s steps(1, end) infinite;
+  animation: nc-tx-blink .55s steps(1, end) infinite;
 }
 .nc-tx-body {
-  display: block;
+  display: none;
   font-family: 'JetBrains Mono', monospace;
   font-size: clamp(16px, 2.4vw, 20px);
   font-weight: 500;
@@ -781,12 +828,27 @@ body.grimfuture .site-nav[data-theme="cream"]   .world-picker .world-btn.active 
   color: var(--nc-yellow);
   text-shadow: 1.5px 0 var(--nc-pink), -1.5px 0 var(--nc-cyan);
 }
+.nc-transmission.is-connecting .nc-tx-ring { display: none; }
+.nc-transmission.is-connecting .nc-tx-connecting { display: block; }
+.nc-transmission.is-connected .nc-tx-ring,
+.nc-transmission.is-connected .nc-tx-connecting { display: none; }
+.nc-transmission.is-connected .nc-tx-body { display: block; animation: nc-tx-in .5s ease both; }
+.nc-transmission.is-connected .nc-tx-dot { animation: none; }
 @keyframes nc-tx-blink {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0.12; }
 }
+@keyframes nc-tx-pulse {
+  0%, 100% { box-shadow: 3px 3px 0 var(--nc-pink); }
+  50%      { box-shadow: 3px 3px 0 var(--nc-pink), 0 0 16px rgba(0, 230, 246, 0.6); }
+}
+@keyframes nc-tx-in {
+  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .nc-tx-blink { animation: none; }
+  .nc-tx-dot, .nc-tx-accept, .nc-tx-connecting { animation: none; }
+  .nc-transmission.is-connected .nc-tx-body { animation: none; }
 }
 .acc-body .spacer { /* aligns under acc-num */ }
 
